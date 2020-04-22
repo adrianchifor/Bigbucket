@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"bigbucket/api"
 	"bigbucket/storage"
 )
 
@@ -23,7 +24,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("project: ", storage.Project)
-	fmt.Println("bucket: ", storage.Bucket)
-	fmt.Println("port: ", port)
+	api.RunServer(port)
 }
