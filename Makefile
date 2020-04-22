@@ -1,12 +1,15 @@
-.PHONY: build download docker docker_push clean
+.PHONY: fmt download build docker docker_push clean
 
-all: download build
+all: fmt download build
 
-build:
-	go build -o bin/bigbucket
+fmt:
+	go fmt
 
 download:
 	go mod download
+
+build:
+	go build -o bin/bigbucket
 
 docker:
 	docker build -t bigbucket .
