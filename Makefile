@@ -17,3 +17,4 @@ docker_push: docker
 
 clean:
 	rm -rf bin/
+	go clean -modcache
