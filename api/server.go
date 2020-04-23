@@ -9,18 +9,18 @@ import (
 func RunServer(port int) {
 	r := gin.Default()
 
-	r.Group("/api")
+	apiRoute := r.Group("/api")
 	{
-		r.GET("/table", listTables)
-		r.POST("/table", createTable)
-		r.DELETE("/table", deleteTable)
+		apiRoute.GET("/table", listTables)
+		apiRoute.POST("/table", createTable)
+		apiRoute.DELETE("/table", deleteTable)
 
-		r.GET("/columnfamily", listColumnFamilies)
-		r.POST("/columnfamily", createColumnFamily)
-		r.DELETE("/columnfamily", deleteColumnFamily)
+		apiRoute.GET("/columnfamily", listColumnFamilies)
+		apiRoute.POST("/columnfamily", createColumnFamily)
+		apiRoute.DELETE("/columnfamily", deleteColumnFamily)
 
-		r.POST("/rows", getSetRows)
-		r.DELETE("/rows", deleteRows)
+		apiRoute.POST("/rows", getSetRows)
+		apiRoute.DELETE("/rows", deleteRows)
 	}
 	r.GET("/healthz", func(c *gin.Context) {
 		c.String(200, "UP")
