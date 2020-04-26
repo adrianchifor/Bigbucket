@@ -5,14 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getRows(c *gin.Context) {
+func listColumns(c *gin.Context) {
 	c.JSON(200, "")
 }
 
-func setRows(c *gin.Context) {
+func createColumn(c *gin.Context) {
 	c.JSON(200, "")
 }
 
-func deleteRows(c *gin.Context) {
+func deleteColumn(c *gin.Context) {
 	c.JSON(200, "")
 }

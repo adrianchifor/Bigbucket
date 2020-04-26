@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,20 +12,26 @@ func RunServer(port int) {
 
 	apiRoute := r.Group("/api")
 	{
-		apiRoute.GET("/table", listTables)
-		apiRoute.POST("/table", createTable)
-		apiRoute.DELETE("/table", deleteTable)
+		apiRoute.GET("/table", httpListTables)
+		apiRoute.POST("/table", httpCreateTable)
+		apiRoute.DELETE("/table", httpDeleteTable)
 
-		apiRoute.GET("/columnfamily", listColumnFamilies)
-		apiRoute.POST("/columnfamily", createColumnFamily)
-		apiRoute.DELETE("/columnfamily", deleteColumnFamily)
+		apiRoute.GET("/column", listColumns)
+		apiRoute.POST("/column", createColumn)
+		apiRoute.DELETE("/column", deleteColumn)
 
-		apiRoute.POST("/rows", getSetRows)
+		apiRoute.GET("/rows", getRows)
+		apiRoute.POST("/rows", setRows)
 		apiRoute.DELETE("/rows", deleteRows)
 	}
-	r.GET("/healthz", func(c *gin.Context) {
+	r.GET("/health", func(c *gin.Context) {
 		c.String(200, "UP")
 	})
 
-	r.Run(fmt.Sprintf(":%d", port))
+	ginMode := os.Getenv("GIN_MODE")
+	if ginMode == "release" {
+		r.Run(fmt.Sprintf(":%d", port))
+	} else {
+		r.Run(fmt.Sprintf("127.0.0.1:%d", port))
+	}
 }

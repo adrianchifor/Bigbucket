@@ -17,7 +17,7 @@ RUN apk add --no-cache ca-certificates && update-ca-certificates
 
 COPY --from=builder /go/bin/bigbucket /
 
-# Disable debug logs in Gin http server
+# Disable debug logs in Gin http server and listen over 0.0.0.0
 ENV GIN_MODE release
 
 ENTRYPOINT ["/bigbucket"]

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"bigbucket/api"
-	"bigbucket/storage"
+	"bigbucket/store"
 )
 
 var port int
@@ -14,8 +14,7 @@ var versionFlag bool
 var version string = "0.1"
 
 func init() {
-	flag.StringVar(&storage.Project, "project", "", "GCP Project (required)")
-	flag.StringVar(&storage.Bucket, "bucket", "", "GCS Bucket (required)")
+	flag.StringVar(&store.BucketName, "bucket", "", "GCS Bucket name (required)")
 	flag.IntVar(&port, "port", 8080, "Server port")
 	flag.BoolVar(&versionFlag, "version", false, "Version")
 	flag.Parse()
@@ -27,10 +26,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	if storage.Project == "" || storage.Bucket == "" {
+	if store.BucketName == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
+
+	store.InitGoog()
 
 	api.RunServer(port)
 }
