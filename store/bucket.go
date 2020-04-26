@@ -15,14 +15,12 @@ import (
 var (
 	BucketName string
 
-	Ctx             context.Context
 	GoogStoreClient storage.Client
 	GoogStoreBucket storage.BucketHandle
 )
 
 func InitGoog() {
-	Ctx = context.Background()
-	GoogStoreClient, err := storage.NewClient(Ctx)
+	GoogStoreClient, err := storage.NewClient(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to create Google Storage client: %v", err)
 	}
@@ -31,7 +29,7 @@ func InitGoog() {
 }
 
 func ListObjects(prefix string, delimiter string) ([]string, error) {
-	ctxTimeout, cancel := context.WithTimeout(Ctx, time.Second*30)
+	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
 	query := &storage.Query{Prefix: prefix, Delimiter: delimiter}
@@ -60,7 +58,7 @@ func WriteObject(object string, data []byte) error {
 		return errors.New("store.WriteObject: data cannot be nil")
 	}
 
-	ctxTimeout, cancel := context.WithTimeout(Ctx, time.Second*30)
+	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
 	obj := GoogStoreBucket.Object(object)
@@ -84,7 +82,7 @@ func ReadObject(object string) ([]byte, error) {
 		return nil, errors.New("store.ReadObject: object cannot be empty string")
 	}
 
-	ctxTimeout, cancel := context.WithTimeout(Ctx, time.Second*30)
+	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
 	obj := GoogStoreBucket.Object(object)
@@ -110,7 +108,7 @@ func DeleteObject(object string) error {
 		return errors.New("store.DeleteObject: object cannot be empty string")
 	}
 
-	ctxTimeout, cancel := context.WithTimeout(Ctx, time.Second*10)
+	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	obj := GoogStoreBucket.Object(object)
