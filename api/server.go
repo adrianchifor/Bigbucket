@@ -12,9 +12,9 @@ func RunServer(port int) {
 
 	apiRoute := r.Group("/api")
 	{
-		apiRoute.GET("/table", httpListTables)
-		apiRoute.POST("/table", httpCreateTable)
-		apiRoute.DELETE("/table", httpDeleteTable)
+		apiRoute.GET("/table", listTables)
+		apiRoute.POST("/table", createTable)
+		apiRoute.DELETE("/table", deleteTable)
 
 		apiRoute.GET("/column", listColumns)
 		apiRoute.POST("/column", createColumn)
