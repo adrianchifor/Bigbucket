@@ -11,7 +11,8 @@ import (
 
 var port int
 var versionFlag bool
-var version string = "0.1"
+
+const version string = "0.1.0"
 
 func init() {
 	flag.StringVar(&store.BucketName, "bucket", "", "GCS Bucket name (required)")
