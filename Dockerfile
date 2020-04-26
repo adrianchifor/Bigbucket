@@ -7,7 +7,7 @@ COPY . /go/src/bigbucket
 
 RUN go mod download
 
-RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/bigbucket
+RUN GOOS=linux GOARCH=amd64 go build -o /go/bin/bigbucket
 
 
 # Runner
