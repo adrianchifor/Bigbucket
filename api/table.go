@@ -9,49 +9,40 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// HTTP handlers
+
 func listTables(c *gin.Context) {
-	tables, err := getTables()
+	tables, _, err := getTables()
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{"error": "Internal server error, check logs"})
 		return
 	}
 
-	// Remove tables marked for deletion from results
-	tablesToDelete := getState("bigbucket/.delete_tables")
-	for _, tableToDelete := range tablesToDelete {
-		index := search(tables, tableToDelete)
-		if index > -1 {
-			tables = removeIndex(tables, index)
-		}
-	}
-
 	c.JSON(200, gin.H{"tables": tables})
 }
 
 func deleteTable(c *gin.Context) {
-	tableName := c.Query("tableName")
+	tableName := c.Query("table")
 	if tableName == "" {
-		c.JSON(400, gin.H{"error": "Please provide tableName as a querystring parameter"})
+		c.JSON(400, gin.H{"error": "Please provide 'table' as a querystring parameter"})
+		return
+	}
+	if !isObjectNameValid(tableName) {
+		c.JSON(400, gin.H{"error": fmt.Sprintf("'table' cannot start with '.' nor contain the following characters: %s", invalidChars)})
 		return
 	}
 
-	tablesToDelete := getState("bigbucket/.delete_tables")
-	if search(tablesToDelete, tableName) > -1 {
-		c.JSON(200, gin.H{"success": fmt.Sprintf("'%s' table already marked for deletion", tableName)})
+	tables, tablesToDelete, err := getTables()
+	if err != nil {
+		log.Print(err)
+		c.JSON(500, gin.H{"error": "Internal server error, check logs"})
+		return
+	}
+
+	if search(tables, tableName) == -1 {
+		c.JSON(404, gin.H{"error": fmt.Sprintf("'%s' table not found or marked for deletion", tableName)})
 	} else {
-		tables, err := getTables()
-		if err != nil {
-			log.Print(err)
-			c.JSON(500, gin.H{"error": "Internal server error, check logs"})
-			return
-		}
-
-		if search(tables, tableName) == -1 {
-			c.JSON(404, gin.H{"error": fmt.Sprintf("'%s' table not found", tableName)})
-			return
-		}
-
 		tablesToDelete = append(tablesToDelete, tableName)
 		err = writeState("bigbucket/.delete_tables", tablesToDelete)
 		if err != nil {
@@ -63,13 +54,15 @@ func deleteTable(c *gin.Context) {
 	}
 }
 
-func getTables() ([]string, error) {
-	objects, err := store.ListObjects("bigbucket/", "/")
+// Table helper functions
+
+func getTables() (tables []string, tablesToDelete []string, err error) {
+	tables = []string{}
+	objects, err := store.ListObjects("bigbucket/", "/", 0)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var tables []string
 	for _, table := range objects {
 		cleanTable := strings.Replace(strings.Replace(table, "bigbucket", "", 1), "/", "", -1)
 		if cleanTable != "" {
@@ -77,5 +70,14 @@ func getTables() ([]string, error) {
 		}
 	}
 
-	return tables, nil
+	// Remove tables marked for deletion from results
+	tablesToDelete = getState("bigbucket/.delete_tables")
+	for _, tableToDelete := range tablesToDelete {
+		index := search(tables, tableToDelete)
+		if index > -1 {
+			tables = removeIndex(tables, index)
+		}
+	}
+
+	return tables, tablesToDelete, nil
 }

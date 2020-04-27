@@ -7,3 +7,4 @@
 - Schema enforcement at API layer
 - Authentication and access policies
 - Support file/blob uploads as cell values
+- Start/End row key scanning

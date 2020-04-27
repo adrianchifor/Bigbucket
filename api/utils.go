@@ -3,8 +3,13 @@ package api
 import (
 	"bytes"
 	"encoding/gob"
+	"strings"
 
 	"bigbucket/store"
+)
+
+var (
+	invalidChars = []string{"\n", "\r", "\t", "\b", "#", "[", "]", "?", "/"}
 )
 
 func getState(object string) []string {
@@ -31,6 +36,20 @@ func writeState(object string, state []string) error {
 	}
 
 	return nil
+}
+
+func isObjectNameValid(object string) bool {
+	if strings.HasPrefix(object, ".") {
+		return false
+	}
+
+	for _, char := range invalidChars {
+		if strings.Contains(object, char) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // Returns index if found, otherwise -1

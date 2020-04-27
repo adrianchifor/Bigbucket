@@ -28,15 +28,19 @@ func InitGoog() {
 	GoogStoreBucket = *GoogStoreClient.Bucket(BucketName)
 }
 
-func ListObjects(prefix string, delimiter string) ([]string, error) {
+func ListObjects(prefix string, delimiter string, limit int) ([]string, error) {
 	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
 	query := &storage.Query{Prefix: prefix, Delimiter: delimiter}
-
-	var names []string
 	it := GoogStoreBucket.Objects(ctxTimeout, query)
+
+	var objects []string
+	count := 0
 	for {
+		if limit > 0 && count == limit {
+			return objects, nil
+		}
 		attrs, err := it.Next()
 		if err == iterator.Done {
 			break
@@ -45,13 +49,14 @@ func ListObjects(prefix string, delimiter string) ([]string, error) {
 			return nil, err
 		}
 		if delimiter != "" {
-			names = append(names, attrs.Prefix)
+			objects = append(objects, attrs.Prefix)
 		} else {
-			names = append(names, attrs.Name)
+			objects = append(objects, attrs.Name)
 		}
+		count++
 	}
 
-	return names, nil
+	return objects, nil
 }
 
 func WriteObject(object string, data []byte) error {
