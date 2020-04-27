@@ -9,10 +9,6 @@ func listColumns(c *gin.Context) {
 	c.JSON(200, "")
 }
 
-func createColumn(c *gin.Context) {
-	c.JSON(200, "")
-}
-
 func deleteColumn(c *gin.Context) {
 	c.JSON(200, "")
 }
