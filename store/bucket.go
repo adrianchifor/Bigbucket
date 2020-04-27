@@ -44,7 +44,11 @@ func ListObjects(prefix string, delimiter string) ([]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		names = append(names, attrs.Name)
+		if delimiter != "" {
+			names = append(names, attrs.Prefix)
+		} else {
+			names = append(names, attrs.Name)
+		}
 	}
 
 	return names, nil
