@@ -18,7 +18,7 @@ func listColumns(c *gin.Context) {
 		return
 	}
 	if !isObjectNameValid(tableName) {
-		c.JSON(400, gin.H{"error": fmt.Sprintf("'table' cannot start with '.' nor contain the following characters: %s", invalidChars)})
+		c.JSON(400, gin.H{"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars)})
 		return
 	}
 
@@ -55,7 +55,7 @@ func deleteColumn(c *gin.Context) {
 		return
 	}
 	if !isObjectNameValid(tableName) || !isObjectNameValid(columnName) {
-		c.JSON(400, gin.H{"error": fmt.Sprintf("'table/column' cannot start with '.' nor contain the following characters: %s", invalidChars)})
+		c.JSON(400, gin.H{"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars)})
 		return
 	}
 
