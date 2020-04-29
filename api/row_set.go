@@ -48,7 +48,10 @@ func setRow(c *gin.Context) {
 		return
 	}
 
-	columnsJobPool := parallel.SmallJobPool()
+	columnsJobPool := parallel.CustomJobPool(parallel.JobPoolConfig{
+		WorkerCount:  len(jsonPayload),
+		JobQueueSize: len(jsonPayload) * 10,
+	})
 	defer columnsJobPool.Close()
 
 	writesFailed := map[string]error{}
