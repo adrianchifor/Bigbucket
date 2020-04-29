@@ -18,6 +18,7 @@ func RunServer(port int) {
 		apiRoute.GET("/column", listColumns)
 		apiRoute.DELETE("/column", deleteColumn)
 
+		apiRoute.GET("/row", getRow)
 		apiRoute.GET("/rows", getRows)
 		apiRoute.POST("/row", setRow)
 		apiRoute.DELETE("/row", deleteRow)

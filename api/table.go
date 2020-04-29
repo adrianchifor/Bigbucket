@@ -25,7 +25,7 @@ func listTables(c *gin.Context) {
 }
 
 func deleteTable(c *gin.Context) {
-	tableName := c.Query("table")
+	tableName := strings.TrimSpace(c.Query("table"))
 	if tableName == "" {
 		c.JSON(400, gin.H{
 			"error": "Please provide 'table' as a querystring parameter",

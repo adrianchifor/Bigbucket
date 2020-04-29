@@ -12,7 +12,7 @@ import (
 // HTTP handlers
 
 func listColumns(c *gin.Context) {
-	tableName := c.Query("table")
+	tableName := strings.TrimSpace(c.Query("table"))
 	if tableName == "" {
 		c.JSON(400, gin.H{
 			"error": "Please provide 'table' as a querystring parameter",
@@ -54,14 +54,14 @@ func listColumns(c *gin.Context) {
 }
 
 func deleteColumn(c *gin.Context) {
-	tableName := c.Query("table")
+	tableName := strings.TrimSpace(c.Query("table"))
 	if tableName == "" {
 		c.JSON(400, gin.H{
 			"error": "Please provide 'table' as a querystring parameter",
 		})
 		return
 	}
-	columnName := c.Query("column")
+	columnName := strings.TrimSpace(c.Query("column"))
 	if columnName == "" {
 		c.JSON(400, gin.H{
 			"error": "Please provide 'column' as a querystring parameter",

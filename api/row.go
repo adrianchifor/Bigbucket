@@ -12,24 +12,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func getRow(c *gin.Context) {
+
+}
+
 func getRows(c *gin.Context) {
-	tableName := c.Query("table")
+	tableName := strings.TrimSpace(c.Query("table"))
 	if tableName == "" {
 		c.JSON(400, gin.H{
 			"error": "Please provide 'table' as a querystring parameter",
 		})
 		return
 	}
-	rowKey := c.Query("key")
-	rowPrefix := c.Query("prefix")
+	rowKey := strings.TrimSpace(c.Query("key"))
+	rowPrefix := strings.TrimSpace(c.Query("prefix"))
 	if rowKey != "" && rowPrefix != "" {
 		c.JSON(400, gin.H{
 			"error": "Please provide only one of 'key' or 'prefix' as a querystring parameter",
 		})
 		return
 	}
-	columns := c.Query("columns")
-	rowsCount := c.Query("count")
+	columns := strings.TrimSpace(c.Query("columns"))
+	rowsCount := strings.TrimSpace(c.Query("count"))
 
 	if !isObjectNameValid(tableName) || !isObjectNameValid(rowKey) || !isObjectNameValid(rowPrefix) ||
 		!isObjectNameValid(columns) || !isObjectNameValid(rowsCount) {
@@ -42,7 +46,7 @@ func getRows(c *gin.Context) {
 
 	columnsList := []string{}
 	if columns != "" {
-		columnsList = strings.Split(strings.TrimSpace(columns), ",")
+		columnsList = strings.Split(columns, ",")
 	}
 
 	results := make(map[string][]map[string]string)
@@ -52,12 +56,11 @@ func getRows(c *gin.Context) {
 		results[rowKey] = make([]map[string]string, 0)
 
 		if len(columnsList) > 0 {
-			// We should be able to fetch ~10 columns in parallel
 			columnsJobPool := parallel.SmallJobPool()
 			defer columnsJobPool.Close()
 
 			for _, column := range columnsList {
-				// Re-def for access in goroutines below
+				// Re-def for goroutine access
 				column := column
 				columnsJobPool.AddJob(func() {
 					columnValue, _ := store.ReadObject(fmt.Sprintf("bigbucket/%s/%s/%s", tableName, rowKey, column))
@@ -96,14 +99,14 @@ func getRows(c *gin.Context) {
 }
 
 func setRow(c *gin.Context) {
-	tableName := c.Query("table")
+	tableName := strings.TrimSpace(c.Query("table"))
 	if tableName == "" {
 		c.JSON(400, gin.H{
 			"error": "Please provide 'table' as a querystring parameter",
 		})
 		return
 	}
-	rowKey := c.Query("key")
+	rowKey := strings.TrimSpace(c.Query("key"))
 	if rowKey == "" {
 		c.JSON(400, gin.H{
 			"error": "Please provide 'key' as a querystring parameter",
@@ -139,11 +142,10 @@ func setRow(c *gin.Context) {
 	writesFailedLock := &sync.Mutex{}
 
 	for column, value := range jsonPayload {
+		column := strings.TrimSpace(column)
 		if column == "" {
 			continue
 		}
-		// Re-def for access in goroutines below
-		column := column
 		value := value
 
 		columnsJobPool.AddJob(func() {
