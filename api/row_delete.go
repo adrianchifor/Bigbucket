@@ -59,7 +59,10 @@ func deleteRows(c *gin.Context) {
 		return
 	}
 
-	deleteJobPool := parallel.SmallJobPool()
+	deleteJobPool := parallel.CustomJobPool(parallel.JobPoolConfig{
+		WorkerCount:  len(objects),
+		JobQueueSize: len(objects) * 10,
+	})
 	defer deleteJobPool.Close()
 
 	deletesFailed := map[string]error{}
@@ -101,7 +104,7 @@ func deleteRows(c *gin.Context) {
 			keyColumnsFailed = append(keyColumnsFailed, keyColumn)
 		}
 
-		errorMsg := fmt.Sprintf("Check logs, some columns failed to be deleted: %s", keyColumnsFailed)
+		errorMsg := fmt.Sprintf("Check server logs, some columns failed to be deleted: %s", keyColumnsFailed)
 		if bucketRateLimit {
 			errorMsg = fmt.Sprintf("Bucket is rate limiting, some columns failed to be deleted: %s", keyColumnsFailed)
 		}

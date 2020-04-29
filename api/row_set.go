@@ -91,7 +91,7 @@ func setRow(c *gin.Context) {
 			columnsFailed = append(columnsFailed, column)
 		}
 
-		errorMsg := fmt.Sprintf("Check logs, some columns failed to persist: %s", columnsFailed)
+		errorMsg := fmt.Sprintf("Check server logs, some columns failed to persist: %s", columnsFailed)
 		if bucketRateLimit {
 			errorMsg = fmt.Sprintf("Bucket is rate limiting, some columns failed to persist: %s", columnsFailed)
 		}
