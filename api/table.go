@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 
 	"bigbucket/store"
@@ -93,5 +94,6 @@ func getTables() (tables []string, tablesToDelete []string, err error) {
 		}
 	}
 
+	sort.Strings(tables)
 	return tables, tablesToDelete, nil
 }

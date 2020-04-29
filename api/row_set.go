@@ -26,7 +26,6 @@ func setRow(c *gin.Context) {
 		})
 		return
 	}
-
 	if !isObjectNameValid(tableName) || !isObjectNameValid(rowKey) {
 		c.JSON(400, gin.H{
 			"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars),

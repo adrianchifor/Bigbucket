@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 
 	"bigbucket/store"
@@ -130,8 +131,13 @@ func getColumns(table string) (columns []string, columnsToDelete []string, err e
 	if len(objects) < 2 {
 		return columns, nil, nil
 	}
+	indexDelete := search(objects, fmt.Sprintf("bigbucket/%s/.delete_columns", table))
+	if indexDelete > -1 {
+		objects = removeIndex(objects, indexDelete)
+	}
 
-	firstKeyPath := objects[1]
+	firstKey := strings.Split(objects[0], "/")[2]
+	firstKeyPath := fmt.Sprintf("bigbucket/%s/%s/", table, firstKey)
 	objects, err = store.ListObjects(firstKeyPath, "", 0)
 	if err != nil {
 		return nil, nil, err
@@ -153,5 +159,6 @@ func getColumns(table string) (columns []string, columnsToDelete []string, err e
 		}
 	}
 
+	sort.Strings(columns)
 	return columns, columnsToDelete, nil
 }
