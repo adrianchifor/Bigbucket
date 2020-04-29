@@ -15,17 +15,16 @@ import (
 var (
 	BucketName string
 
-	GoogStoreClient storage.Client
-	GoogStoreBucket storage.BucketHandle
+	GoogBucket storage.BucketHandle
 )
 
 func InitGoog() {
-	GoogStoreClient, err := storage.NewClient(context.Background())
+	gcsClient, err := storage.NewClient(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to create Google Storage client: %v", err)
 	}
 
-	GoogStoreBucket = *GoogStoreClient.Bucket(BucketName)
+	GoogBucket = *gcsClient.Bucket(BucketName)
 }
 
 func ListObjects(prefix string, delimiter string, limit int) ([]string, error) {
@@ -33,7 +32,7 @@ func ListObjects(prefix string, delimiter string, limit int) ([]string, error) {
 	defer cancel()
 
 	query := &storage.Query{Prefix: prefix, Delimiter: delimiter}
-	it := GoogStoreBucket.Objects(ctxTimeout, query)
+	it := GoogBucket.Objects(ctxTimeout, query)
 
 	var objects []string
 	count := 0
@@ -67,16 +66,17 @@ func WriteObject(object string, data []byte) error {
 		return errors.New("store.WriteObject: data cannot be nil")
 	}
 
-	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*30)
-	defer cancel()
-
-	obj := GoogStoreBucket.Object(object)
-	w := obj.NewWriter(ctxTimeout)
-
 	compressedData, err := zstd.Compress(nil, data)
 	if err != nil {
 		return err
 	}
+
+	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	obj := GoogBucket.Object(object)
+
+	w := obj.NewWriter(ctxTimeout)
 	w.Write(compressedData)
 
 	if err := w.Close(); err != nil {
@@ -94,7 +94,8 @@ func ReadObject(object string) ([]byte, error) {
 	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
-	obj := GoogStoreBucket.Object(object)
+	obj := GoogBucket.Object(object)
+
 	r, err := obj.NewReader(ctxTimeout)
 	if err != nil {
 		return nil, err
@@ -120,7 +121,8 @@ func DeleteObject(object string) error {
 	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	obj := GoogStoreBucket.Object(object)
+	obj := GoogBucket.Object(object)
+
 	if err := obj.Delete(ctxTimeout); err != nil {
 		return err
 	}
