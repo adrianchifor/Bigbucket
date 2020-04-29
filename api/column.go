@@ -30,7 +30,7 @@ func listColumns(c *gin.Context) {
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{
-			"error": "Internal server error, check logs",
+			"error": "Internal error, check server logs",
 		})
 		return
 	}
@@ -45,7 +45,7 @@ func listColumns(c *gin.Context) {
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{
-			"error": "Internal server error, check logs",
+			"error": "Internal error, check server logs",
 		})
 		return
 	}
@@ -79,7 +79,7 @@ func deleteColumn(c *gin.Context) {
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{
-			"error": "Internal server error, check logs",
+			"error": "Internal error, check server logs",
 		})
 		return
 	}
@@ -94,7 +94,7 @@ func deleteColumn(c *gin.Context) {
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{
-			"error": "Internal server error, check logs",
+			"error": "Internal error, check server logs",
 		})
 		return
 	}
@@ -109,7 +109,7 @@ func deleteColumn(c *gin.Context) {
 		if err != nil {
 			log.Print(err)
 			c.JSON(500, gin.H{
-				"error": "Internal server error, check logs",
+				"error": "Internal error, check server logs",
 			})
 			return
 		}

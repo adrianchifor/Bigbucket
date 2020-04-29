@@ -18,10 +18,9 @@ func RunServer(port int) {
 		apiRoute.GET("/column", listColumns)
 		apiRoute.DELETE("/column", deleteColumn)
 
-		apiRoute.GET("/row", getRow)
-		apiRoute.GET("/rows", getRows)
+		apiRoute.GET("/row", getRows)
 		apiRoute.POST("/row", setRow)
-		apiRoute.DELETE("/row", deleteRow)
+		apiRoute.DELETE("/row", deleteRows)
 	}
 	r.GET("/health", func(c *gin.Context) {
 		c.String(200, "UP")

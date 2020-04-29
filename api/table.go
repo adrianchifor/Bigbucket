@@ -16,7 +16,7 @@ func listTables(c *gin.Context) {
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{
-			"error": "Internal server error, check logs",
+			"error": "Internal error, check server logs",
 		})
 		return
 	}
@@ -43,7 +43,7 @@ func deleteTable(c *gin.Context) {
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{
-			"error": "Internal server error, check logs",
+			"error": "Internal error, check server logs",
 		})
 		return
 	}
@@ -58,7 +58,7 @@ func deleteTable(c *gin.Context) {
 		if err != nil {
 			log.Print(err)
 			c.JSON(500, gin.H{
-				"error": "Internal server error, check logs",
+				"error": "Internal error, check server logs",
 			})
 			return
 		}
