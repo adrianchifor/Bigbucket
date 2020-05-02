@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"bigbucket/store"
+	"bigbucket/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,13 +39,13 @@ func deleteTable(c *gin.Context) {
 		return
 	}
 
-	if search(tables, params["table"]) == -1 {
+	if utils.Search(tables, params["table"]) == -1 {
 		c.JSON(404, gin.H{
 			"error": fmt.Sprintf("Table '%s' not found or marked for deletion", params["table"]),
 		})
 	} else {
 		tablesToDelete = append(tablesToDelete, params["table"])
-		err = writeState("bigbucket/.delete_tables", tablesToDelete)
+		err = utils.WriteState("bigbucket/.delete_tables", tablesToDelete)
 		if err != nil {
 			log.Print(err)
 			c.JSON(500, gin.H{
@@ -73,11 +74,11 @@ func getTables() (tables []string, tablesToDelete []string, err error) {
 	}
 
 	// Remove tables marked for deletion from results
-	tablesToDelete = getState("bigbucket/.delete_tables")
+	tablesToDelete = utils.GetState("bigbucket/.delete_tables")
 	for _, tableToDelete := range tablesToDelete {
-		index := search(tables, tableToDelete)
+		index := utils.Search(tables, tableToDelete)
 		if index > -1 {
-			tables = removeIndex(tables, index)
+			tables = utils.RemoveIndex(tables, index)
 		}
 	}
 

@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"bigbucket/store"
+	"bigbucket/utils"
 	"github.com/adrianchifor/go-parallel"
 	"github.com/gin-gonic/gin"
 )
@@ -25,7 +26,7 @@ func getRows(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	params := mergeMaps(tableMap, columnsCountMap)
+	params := utils.MergeMaps(tableMap, columnsCountMap)
 
 	columnsList := []string{}
 	if params["columns"] != "" {
@@ -126,7 +127,7 @@ func getRows(c *gin.Context) {
 			}
 			resultsMutex.Unlock()
 
-			if len(columnsList) > 0 && search(columnsList, objectColumn) == -1 {
+			if len(columnsList) > 0 && utils.Search(columnsList, objectColumn) == -1 {
 				// End goroutine if current column is not in the specified columns
 				return
 			}

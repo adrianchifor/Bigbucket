@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"bigbucket/store"
+	"bigbucket/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +25,7 @@ func listColumns(c *gin.Context) {
 		})
 		return
 	}
-	if search(tables, params["table"]) == -1 {
+	if utils.Search(tables, params["table"]) == -1 {
 		c.JSON(404, gin.H{
 			"error": fmt.Sprintf("Table '%s' not found or marked for deletion", params["table"]),
 		})
@@ -57,7 +58,7 @@ func deleteColumn(c *gin.Context) {
 		})
 		return
 	}
-	if search(tables, params["table"]) == -1 {
+	if utils.Search(tables, params["table"]) == -1 {
 		c.JSON(404, gin.H{
 			"error": fmt.Sprintf("Table '%s' not found or marked for deletion", params["table"]),
 		})
@@ -73,13 +74,13 @@ func deleteColumn(c *gin.Context) {
 		return
 	}
 
-	if search(columns, params["column"]) == -1 {
+	if utils.Search(columns, params["column"]) == -1 {
 		c.JSON(404, gin.H{
 			"error": fmt.Sprintf("Column '%s' not found or marked for deletion in table '%s'", params["column"], params["table"]),
 		})
 	} else {
 		columnsToDelete = append(columnsToDelete, params["column"])
-		err = writeState(fmt.Sprintf("bigbucket/%s/.delete_columns", params["table"]), columnsToDelete)
+		err = utils.WriteState(fmt.Sprintf("bigbucket/%s/.delete_columns", params["table"]), columnsToDelete)
 		if err != nil {
 			log.Print(err)
 			c.JSON(500, gin.H{
@@ -102,9 +103,9 @@ func getColumns(table string) (columns []string, columnsToDelete []string, err e
 	if len(objects) < 2 {
 		return columns, nil, nil
 	}
-	indexDelete := search(objects, fmt.Sprintf("bigbucket/%s/.delete_columns", table))
+	indexDelete := utils.Search(objects, fmt.Sprintf("bigbucket/%s/.delete_columns", table))
 	if indexDelete > -1 {
-		objects = removeIndex(objects, indexDelete)
+		objects = utils.RemoveIndex(objects, indexDelete)
 	}
 
 	firstKey := strings.Split(objects[0], "/")[2]
@@ -122,11 +123,11 @@ func getColumns(table string) (columns []string, columnsToDelete []string, err e
 	}
 
 	// Remove columns marked for deletion from results
-	columnsToDelete = getState(fmt.Sprintf("bigbucket/%s/.delete_columns", table))
+	columnsToDelete = utils.GetState(fmt.Sprintf("bigbucket/%s/.delete_columns", table))
 	for _, columnToDelete := range columnsToDelete {
-		index := search(columns, columnToDelete)
+		index := utils.Search(columns, columnToDelete)
 		if index > -1 {
-			columns = removeIndex(columns, index)
+			columns = utils.RemoveIndex(columns, index)
 		}
 	}
 
