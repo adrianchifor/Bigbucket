@@ -25,7 +25,8 @@ var (
 func init() {
 	flag.StringVar(&store.BucketName, "bucket", "", "Bucket name (required, e.g. gs://<bucket-name>)")
 	flag.IntVar(&port, "port", 0, "Server port (default 8080)")
-	flag.BoolVar(&cleanerFlag, "cleaner", false, "Run Bigbucket in cleaner mode (default false). Executes based on --cleaner-interval")
+	flag.BoolVar(&cleanerFlag, "cleaner", false, "Run Bigbucket in cleaner mode (default false). "+
+		"Will garbage collect tables and columns marked for deletion. Executes based on --cleaner-interval")
 	flag.IntVar(&cleanerInterval, "cleaner-interval", 0, "Bigbucket cleaner interval (default 0, runs only once). "+
 		"To run cleaner every hour, you can set --cleaner-interval 3600")
 	flag.BoolVar(&cleanerHttpFlag, "cleaner-http", false, "Run Bigbucket in cleaner HTTP mode (default false). "+
