@@ -3,13 +3,8 @@ package api
 import (
 	"bytes"
 	"encoding/gob"
-	"strings"
 
 	"bigbucket/store"
-)
-
-var (
-	invalidChars = []string{"\n", "\r", "\t", "\b", "#", "[", "]", "?", "/"}
 )
 
 func getState(object string) []string {
@@ -38,20 +33,6 @@ func writeState(object string, state []string) error {
 	return nil
 }
 
-func isObjectNameValid(object string) bool {
-	if strings.HasPrefix(object, ".") {
-		return false
-	}
-
-	for _, char := range invalidChars {
-		if strings.Contains(object, char) {
-			return false
-		}
-	}
-
-	return true
-}
-
 // Returns index if found, otherwise -1
 func search(list []string, a string) int {
 	for i, elem := range list {
@@ -68,4 +49,15 @@ func removeIndex(list []string, index int) []string {
 	list = list[:len(list)-1]
 
 	return list
+}
+
+func mergeMaps(maps ...map[string]string) map[string]string {
+	mergedMap := make(map[string]string)
+	for _, innerMap := range maps {
+		for k, v := range innerMap {
+			mergedMap[k] = v
+		}
+	}
+
+	return mergedMap
 }

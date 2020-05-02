@@ -11,17 +11,8 @@ import (
 )
 
 func listColumns(c *gin.Context) {
-	tableName := strings.TrimSpace(c.Query("table"))
-	if tableName == "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide 'table' as a querystring parameter",
-		})
-		return
-	}
-	if !isObjectNameValid(tableName) {
-		c.JSON(400, gin.H{
-			"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars),
-		})
+	params, err := parseRequiredRequestParams(c, "table")
+	if err != nil {
 		return
 	}
 
@@ -33,14 +24,14 @@ func listColumns(c *gin.Context) {
 		})
 		return
 	}
-	if search(tables, tableName) == -1 {
+	if search(tables, params["table"]) == -1 {
 		c.JSON(404, gin.H{
-			"error": fmt.Sprintf("Table '%s' not found or marked for deletion", tableName),
+			"error": fmt.Sprintf("Table '%s' not found or marked for deletion", params["table"]),
 		})
 		return
 	}
 
-	columns, _, err := getColumns(tableName)
+	columns, _, err := getColumns(params["table"])
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{
@@ -49,28 +40,12 @@ func listColumns(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"table": tableName, "columns": columns})
+	c.JSON(200, gin.H{"table": params["table"], "columns": columns})
 }
 
 func deleteColumn(c *gin.Context) {
-	tableName := strings.TrimSpace(c.Query("table"))
-	if tableName == "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide 'table' as a querystring parameter",
-		})
-		return
-	}
-	columnName := strings.TrimSpace(c.Query("column"))
-	if columnName == "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide 'column' as a querystring parameter",
-		})
-		return
-	}
-	if !isObjectNameValid(tableName) || !isObjectNameValid(columnName) {
-		c.JSON(400, gin.H{
-			"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars),
-		})
+	params, err := parseRequiredRequestParams(c, "table", "column")
+	if err != nil {
 		return
 	}
 
@@ -82,14 +57,14 @@ func deleteColumn(c *gin.Context) {
 		})
 		return
 	}
-	if search(tables, tableName) == -1 {
+	if search(tables, params["table"]) == -1 {
 		c.JSON(404, gin.H{
-			"error": fmt.Sprintf("Table '%s' not found or marked for deletion", tableName),
+			"error": fmt.Sprintf("Table '%s' not found or marked for deletion", params["table"]),
 		})
 		return
 	}
 
-	columns, columnsToDelete, err := getColumns(tableName)
+	columns, columnsToDelete, err := getColumns(params["table"])
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{
@@ -98,13 +73,13 @@ func deleteColumn(c *gin.Context) {
 		return
 	}
 
-	if search(columns, columnName) == -1 {
+	if search(columns, params["column"]) == -1 {
 		c.JSON(404, gin.H{
-			"error": fmt.Sprintf("Column '%s' not found or marked for deletion in table '%s'", columnName, tableName),
+			"error": fmt.Sprintf("Column '%s' not found or marked for deletion in table '%s'", params["column"], params["table"]),
 		})
 	} else {
-		columnsToDelete = append(columnsToDelete, columnName)
-		err = writeState(fmt.Sprintf("bigbucket/%s/.delete_columns", tableName), columnsToDelete)
+		columnsToDelete = append(columnsToDelete, params["column"])
+		err = writeState(fmt.Sprintf("bigbucket/%s/.delete_columns", params["table"]), columnsToDelete)
 		if err != nil {
 			log.Print(err)
 			c.JSON(500, gin.H{
@@ -113,7 +88,7 @@ func deleteColumn(c *gin.Context) {
 			return
 		}
 		c.JSON(200, gin.H{
-			"success": fmt.Sprintf("Column '%s' marked for deletion in table '%s'", columnName, tableName),
+			"success": fmt.Sprintf("Column '%s' marked for deletion in table '%s'", params["column"], params["table"]),
 		})
 	}
 }

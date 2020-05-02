@@ -13,36 +13,23 @@ import (
 )
 
 func getRows(c *gin.Context) {
-	tableName := strings.TrimSpace(c.Query("table"))
-	if tableName == "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide 'table' as a querystring parameter",
-		})
+	tableMap, err := parseRequiredRequestParams(c, "table")
+	if err != nil {
 		return
 	}
-	rowKey := strings.TrimSpace(c.Query("key"))
-	rowPrefix := strings.TrimSpace(c.Query("prefix"))
-	if rowKey != "" && rowPrefix != "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide only one of 'key' or 'prefix' as a querystring parameter",
-		})
+	rowKey, rowPrefix, err := parseExclusiveRequestParams(c, "key", "prefix")
+	if err != nil {
 		return
 	}
-	columns := strings.TrimSpace(c.Query("columns"))
-	rowsCount := strings.TrimSpace(c.Query("count"))
-
-	if !isObjectNameValid(tableName) || !isObjectNameValid(rowKey) || !isObjectNameValid(rowPrefix) ||
-		!isObjectNameValid(columns) || !isObjectNameValid(rowsCount) {
-
-		c.JSON(400, gin.H{
-			"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars),
-		})
+	columnsCountMap, err := parseOptionalRequestParams(c, "columns", "count")
+	if err != nil {
 		return
 	}
+	params := mergeMaps(tableMap, columnsCountMap)
 
 	columnsList := []string{}
-	if columns != "" {
-		columnsList = strings.Split(columns, ",")
+	if params["columns"] != "" {
+		columnsList = strings.Split(params["columns"], ",")
 	}
 
 	results := make(map[string]map[string]string)
@@ -50,7 +37,7 @@ func getRows(c *gin.Context) {
 	// When a specific key and columns are requested (no queries, direct fetches)
 	if rowKey != "" && len(columnsList) > 0 {
 		var err error
-		results[rowKey], err = getRowColumns(tableName, rowKey, columnsList)
+		results[rowKey], err = getRowColumns(params["table"], rowKey, columnsList)
 		if err != nil {
 			log.Print(err)
 			c.JSON(500, gin.H{
@@ -63,8 +50,8 @@ func getRows(c *gin.Context) {
 	}
 
 	rowsCountInt := 0
-	if rowsCount != "" {
-		if n, err := strconv.Atoi(rowsCount); err == nil {
+	if params["count"] != "" {
+		if n, err := strconv.Atoi(params["count"]); err == nil {
 			rowsCountInt = n
 		} else {
 			c.JSON(400, gin.H{"error": "'count' parameter has to be an integer"})
@@ -72,11 +59,11 @@ func getRows(c *gin.Context) {
 		}
 	}
 
-	keyPath := fmt.Sprintf("bigbucket/%s/", tableName)
+	keyPath := fmt.Sprintf("bigbucket/%s/", params["table"])
 	if rowKey != "" {
-		keyPath = fmt.Sprintf("bigbucket/%s/%s/", tableName, rowKey)
+		keyPath = fmt.Sprintf("bigbucket/%s/%s/", params["table"], rowKey)
 	} else if rowPrefix != "" {
-		keyPath = fmt.Sprintf("bigbucket/%s/%s", tableName, rowPrefix)
+		keyPath = fmt.Sprintf("bigbucket/%s/%s", params["table"], rowPrefix)
 	}
 
 	objects, err := store.ListObjects(keyPath, "", 0)
@@ -88,11 +75,11 @@ func getRows(c *gin.Context) {
 		return
 	}
 	if len(objects) == 0 {
-		errMsg := fmt.Sprintf("Table '%s' not found", tableName)
+		errMsg := fmt.Sprintf("Table '%s' not found", params["table"])
 		if rowKey != "" {
-			errMsg = fmt.Sprintf("Row key '%s' not found in table '%s'", rowKey, tableName)
+			errMsg = fmt.Sprintf("Row key '%s' not found in table '%s'", rowKey, params["table"])
 		} else if rowPrefix != "" {
-			errMsg = fmt.Sprintf("Rows with key prefix '%s' not found in table '%s'", rowPrefix, tableName)
+			errMsg = fmt.Sprintf("Rows with key prefix '%s' not found in table '%s'", rowPrefix, params["table"])
 		}
 		c.JSON(404, gin.H{
 			"error": errMsg,

@@ -24,17 +24,8 @@ func listTables(c *gin.Context) {
 }
 
 func deleteTable(c *gin.Context) {
-	tableName := strings.TrimSpace(c.Query("table"))
-	if tableName == "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide 'table' as a querystring parameter",
-		})
-		return
-	}
-	if !isObjectNameValid(tableName) {
-		c.JSON(400, gin.H{
-			"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars),
-		})
+	params, err := parseRequiredRequestParams(c, "table")
+	if err != nil {
 		return
 	}
 
@@ -47,12 +38,12 @@ func deleteTable(c *gin.Context) {
 		return
 	}
 
-	if search(tables, tableName) == -1 {
+	if search(tables, params["table"]) == -1 {
 		c.JSON(404, gin.H{
-			"error": fmt.Sprintf("Table '%s' not found or marked for deletion", tableName),
+			"error": fmt.Sprintf("Table '%s' not found or marked for deletion", params["table"]),
 		})
 	} else {
-		tablesToDelete = append(tablesToDelete, tableName)
+		tablesToDelete = append(tablesToDelete, params["table"])
 		err = writeState("bigbucket/.delete_tables", tablesToDelete)
 		if err != nil {
 			log.Print(err)
@@ -62,7 +53,7 @@ func deleteTable(c *gin.Context) {
 			return
 		}
 		c.JSON(200, gin.H{
-			"success": fmt.Sprintf("Table '%s' marked for deletion", tableName),
+			"success": fmt.Sprintf("Table '%s' marked for deletion", params["table"]),
 		})
 	}
 }

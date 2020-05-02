@@ -12,24 +12,8 @@ import (
 )
 
 func setRow(c *gin.Context) {
-	tableName := strings.TrimSpace(c.Query("table"))
-	if tableName == "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide 'table' as a querystring parameter",
-		})
-		return
-	}
-	rowKey := strings.TrimSpace(c.Query("key"))
-	if rowKey == "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide 'key' as a querystring parameter",
-		})
-		return
-	}
-	if !isObjectNameValid(tableName) || !isObjectNameValid(rowKey) {
-		c.JSON(400, gin.H{
-			"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars),
-		})
+	params, err := parseRequiredRequestParams(c, "table", "key")
+	if err != nil {
 		return
 	}
 
@@ -64,7 +48,7 @@ func setRow(c *gin.Context) {
 		value := value
 
 		columnsJobPool.AddJob(func() {
-			err := store.WriteObject(fmt.Sprintf("bigbucket/%s/%s/%s", tableName, rowKey, column), []byte(value))
+			err := store.WriteObject(fmt.Sprintf("bigbucket/%s/%s/%s", params["table"], params["key"], column), []byte(value))
 			if err != nil {
 				writesFailedMutex.Lock()
 				defer writesFailedMutex.Unlock()
@@ -74,7 +58,7 @@ func setRow(c *gin.Context) {
 		})
 	}
 
-	err := columnsJobPool.Wait()
+	err = columnsJobPool.Wait()
 	if err != nil {
 		log.Print(err)
 		c.JSON(500, gin.H{
@@ -104,6 +88,6 @@ func setRow(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"success": fmt.Sprintf("Set row key '%s' in table '%s'", rowKey, tableName),
+		"success": fmt.Sprintf("Set row key '%s' in table '%s'", params["key"], params["table"]),
 	})
 }

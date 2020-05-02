@@ -12,19 +12,12 @@ import (
 )
 
 func deleteRows(c *gin.Context) {
-	tableName := strings.TrimSpace(c.Query("table"))
-	if tableName == "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide 'table' as a querystring parameter",
-		})
+	params, err := parseRequiredRequestParams(c, "table")
+	if err != nil {
 		return
 	}
-	rowKey := strings.TrimSpace(c.Query("key"))
-	rowPrefix := strings.TrimSpace(c.Query("prefix"))
-	if rowKey != "" && rowPrefix != "" {
-		c.JSON(400, gin.H{
-			"error": "Please provide only one of 'key' or 'prefix' as a querystring parameter",
-		})
+	rowKey, rowPrefix, err := parseExclusiveRequestParams(c, "key", "prefix")
+	if err != nil {
 		return
 	}
 	if rowKey == "" && rowPrefix == "" {
@@ -33,16 +26,10 @@ func deleteRows(c *gin.Context) {
 		})
 		return
 	}
-	if !isObjectNameValid(tableName) || !isObjectNameValid(rowKey) || !isObjectNameValid(rowPrefix) {
-		c.JSON(400, gin.H{
-			"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars),
-		})
-		return
-	}
 
-	keyPath := fmt.Sprintf("bigbucket/%s/%s/", tableName, rowKey)
+	keyPath := fmt.Sprintf("bigbucket/%s/%s/", params["table"], rowKey)
 	if rowPrefix != "" {
-		keyPath = fmt.Sprintf("bigbucket/%s/%s", tableName, rowPrefix)
+		keyPath = fmt.Sprintf("bigbucket/%s/%s", params["table"], rowPrefix)
 	}
 
 	objects, err := store.ListObjects(keyPath, "", 0)
@@ -54,9 +41,9 @@ func deleteRows(c *gin.Context) {
 		return
 	}
 	if len(objects) == 0 {
-		errMsg := fmt.Sprintf("Row key '%s' not found in table '%s'", rowKey, tableName)
+		errMsg := fmt.Sprintf("Row key '%s' not found in table '%s'", rowKey, params["table"])
 		if rowPrefix != "" {
-			errMsg = fmt.Sprintf("Rows with key prefix '%s' not found in table '%s'", rowPrefix, tableName)
+			errMsg = fmt.Sprintf("Rows with key prefix '%s' not found in table '%s'", rowPrefix, params["table"])
 		}
 		c.JSON(404, gin.H{
 			"error": errMsg,
@@ -119,9 +106,9 @@ func deleteRows(c *gin.Context) {
 		return
 	}
 
-	successMsg := fmt.Sprintf("Row with key '%s' was deleted from table '%s'", rowKey, tableName)
+	successMsg := fmt.Sprintf("Row with key '%s' was deleted from table '%s'", rowKey, params["table"])
 	if rowPrefix != "" {
-		successMsg = fmt.Sprintf("Rows with key prefix '%s' were deleted from table '%s'", rowPrefix, tableName)
+		successMsg = fmt.Sprintf("Rows with key prefix '%s' were deleted from table '%s'", rowPrefix, params["table"])
 	}
 	c.JSON(200, gin.H{
 		"success": successMsg,
