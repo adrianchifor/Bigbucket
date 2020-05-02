@@ -10,8 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// HTTP handlers
-
 func listTables(c *gin.Context) {
 	tables, _, err := getTables()
 	if err != nil {
@@ -68,8 +66,6 @@ func deleteTable(c *gin.Context) {
 		})
 	}
 }
-
-// Table helper functions
 
 func getTables() (tables []string, tablesToDelete []string, err error) {
 	tables = []string{}

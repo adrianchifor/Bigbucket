@@ -10,8 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// HTTP handlers
-
 func listColumns(c *gin.Context) {
 	tableName := strings.TrimSpace(c.Query("table"))
 	if tableName == "" {
@@ -119,8 +117,6 @@ func deleteColumn(c *gin.Context) {
 		})
 	}
 }
-
-// Column helper functions
 
 func getColumns(table string) (columns []string, columnsToDelete []string, err error) {
 	columns = []string{}
