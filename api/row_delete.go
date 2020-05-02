@@ -27,6 +27,12 @@ func deleteRows(c *gin.Context) {
 		})
 		return
 	}
+	if rowKey == "" && rowPrefix == "" {
+		c.JSON(400, gin.H{
+			"error": "Please provide one of 'key' or 'prefix' as a querystring parameter. To delete the table use /api/table",
+		})
+		return
+	}
 	if !isObjectNameValid(tableName) || !isObjectNameValid(rowKey) || !isObjectNameValid(rowPrefix) {
 		c.JSON(400, gin.H{
 			"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars),
