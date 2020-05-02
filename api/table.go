@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"sort"
-	"strings"
 
 	"bigbucket/store"
 	"bigbucket/utils"
@@ -60,18 +59,11 @@ func deleteTable(c *gin.Context) {
 }
 
 func getTables() (tables []string, tablesToDelete []string, err error) {
-	tables = []string{}
 	objects, err := store.ListObjects("bigbucket/", "/", 0)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	for _, table := range objects {
-		cleanTable := strings.Replace(strings.Replace(table, "bigbucket", "", 1), "/", "", -1)
-		if cleanTable != "" {
-			tables = append(tables, cleanTable)
-		}
-	}
+	tables = utils.CleanupTables(objects)
 
 	// Remove tables marked for deletion from results
 	tablesToDelete = utils.GetState("bigbucket/.delete_tables")
