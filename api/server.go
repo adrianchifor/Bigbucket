@@ -1,16 +1,14 @@
 package api
 
 import (
-	"fmt"
-	"os"
-
+	"bigbucket/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func RunServer(port int) {
-	r := gin.Default()
+	router := gin.Default()
 
-	apiRoute := r.Group("/api")
+	apiRoute := router.Group("/api")
 	{
 		apiRoute.GET("/table", listTables)
 		apiRoute.DELETE("/table", deleteTable)
@@ -22,14 +20,9 @@ func RunServer(port int) {
 		apiRoute.POST("/row", setRow)
 		apiRoute.DELETE("/row", deleteRows)
 	}
-	r.GET("/health", func(c *gin.Context) {
+	router.GET("/health", func(c *gin.Context) {
 		c.String(200, "UP")
 	})
 
-	ginMode := os.Getenv("GIN_MODE")
-	if ginMode == "release" {
-		r.Run(fmt.Sprintf(":%d", port))
-	} else {
-		r.Run(fmt.Sprintf("127.0.0.1:%d", port))
-	}
+	utils.RunServer(port, router)
 }
