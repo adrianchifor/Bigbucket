@@ -155,6 +155,34 @@ func getRows(c *gin.Context) {
 	c.JSON(200, results)
 }
 
+func getRowsCount(c *gin.Context) {
+	tableMap, err := parseRequiredRequestParams(c, "table")
+	if err != nil {
+		return
+	}
+	prefixMap, err := parseOptionalRequestParams(c, "prefix")
+	if err != nil {
+		return
+	}
+	params := utils.MergeMaps(tableMap, prefixMap)
+
+	keysPath := fmt.Sprintf("bigbucket/%s/", params["table"])
+	if params["prefix"] != "" {
+		keysPath = fmt.Sprintf("bigbucket/%s/%s", params["table"], params["prefix"])
+	}
+
+	rows, err := store.ListObjects(keysPath, "/", 0)
+	if err != nil {
+		log.Print(err)
+		c.JSON(500, gin.H{
+			"error": "Internal error, check server logs",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{"table": params["table"], "rowsCount": strconv.Itoa(len(rows))})
+}
+
 func getRowColumns(table string, rowKey string, columns []string) (map[string]string, error) {
 	results := make(map[string]string)
 	resultsMutex := &sync.Mutex{}

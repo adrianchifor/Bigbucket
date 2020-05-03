@@ -25,16 +25,22 @@ func TestRows(t *testing.T) {
 	if err := readAllRows(); err != nil {
 		t.Error(err)
 	}
-	if err := readRowsPrefix(); err != nil {
+	if err := readRowsWithPrefix(); err != nil {
 		t.Error(err)
 	}
-	if err := readRowsColumns(); err != nil {
+	if err := readRowsWithColumns(); err != nil {
 		t.Error(err)
 	}
-	if err := readRowsCount(); err != nil {
+	if err := readRowsWithCount(); err != nil {
 		t.Error(err)
 	}
 	if err := readRowsBadParams(); err != nil {
+		t.Error(err)
+	}
+	if err := countRows(); err != nil {
+		t.Error(err)
+	}
+	if err := countRowsBadParams(); err != nil {
 		t.Error(err)
 	}
 	if err := deleteSingleRow(); err != nil {
@@ -185,13 +191,13 @@ func readAllRows() error {
 	return nil
 }
 
-func readRowsPrefix() error {
+func readRowsWithPrefix() error {
 	resp, err := http.Get("http://127.0.0.1:8080/api/row?table=test1&prefix=key")
 	if err != nil {
 		return err
 	}
 	if resp.StatusCode != 200 {
-		return errors.New("readRowsPrefix /api/row GET response status code is not 200")
+		return errors.New("readRowsWithPrefix /api/row GET response status code is not 200")
 	}
 
 	defer resp.Body.Close()
@@ -201,21 +207,21 @@ func readRowsPrefix() error {
 		return err
 	}
 	if len(data) < 10 {
-		return errors.New("readRowsPrefix response body doesn't have all rows")
+		return errors.New("readRowsWithPrefix response body doesn't have all rows")
 	}
 	if data["key1"]["col2"] != "qwerty2" {
-		return errors.New("readRowsPrefix key1/col2 value incorrect")
+		return errors.New("readRowsWithPrefix key1/col2 value incorrect")
 	}
 	return nil
 }
 
-func readRowsColumns() error {
+func readRowsWithColumns() error {
 	resp, err := http.Get("http://127.0.0.1:8080/api/row?table=test1&columns=col1,col2")
 	if err != nil {
 		return err
 	}
 	if resp.StatusCode != 200 {
-		return errors.New("readRowsColumns /api/row GET response status code is not 200")
+		return errors.New("readRowsWithColumns /api/row GET response status code is not 200")
 	}
 
 	defer resp.Body.Close()
@@ -225,23 +231,23 @@ func readRowsColumns() error {
 		return err
 	}
 	if len(data) < 20 {
-		return errors.New("readRowsColumns response body doesn't have all rows")
+		return errors.New("readRowsWithColumns response body doesn't have all rows")
 	}
 	for col, _ := range data["key1"] {
 		if col != "col1" && col != "col2" {
-			return errors.New("readRowsColumns got columns other than requested")
+			return errors.New("readRowsWithColumns got columns other than requested")
 		}
 	}
 	return nil
 }
 
-func readRowsCount() error {
+func readRowsWithCount() error {
 	resp, err := http.Get("http://127.0.0.1:8080/api/row?table=test1&count=2")
 	if err != nil {
 		return err
 	}
 	if resp.StatusCode != 200 {
-		return errors.New("readRowsCount /api/row GET response status code is not 200")
+		return errors.New("readRowsWithCount /api/row GET response status code is not 200")
 	}
 
 	defer resp.Body.Close()
@@ -251,7 +257,7 @@ func readRowsCount() error {
 		return err
 	}
 	if len(data) > 2 {
-		return errors.New("readRowsCount response body has more rows than count")
+		return errors.New("readRowsWithCount response body has more rows than count")
 	}
 	return nil
 }
@@ -271,6 +277,39 @@ func readRowsBadParams() error {
 	}
 	if resp.StatusCode != 400 {
 		return errors.New("readRowsBadParams /api/row GET (both key and prefix) response status code is not 400")
+	}
+
+	return nil
+}
+
+func countRows() error {
+	resp, err := http.Get("http://127.0.0.1:8080/api/row/count?table=test1")
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 200 {
+		return errors.New("countRows /api/row/count GET response status code is not 200")
+	}
+
+	defer resp.Body.Close()
+	var data map[string]string
+	json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		return err
+	}
+	if data["rowsCount"] != "20" {
+		return errors.New("countRows count doesn't match what was set")
+	}
+	return nil
+}
+
+func countRowsBadParams() error {
+	resp, err := http.Get("http://127.0.0.1:8080/api/row/count")
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 400 {
+		return errors.New("countRowsBadParams /api/row/count GET (no table) response status code is not 400")
 	}
 
 	return nil
