@@ -3,51 +3,53 @@
 # ./run_tests.sh <Bucket name>
 
 set -u
+set -eE
+
+BUCKET="$1"
+
+function cleanup() {
+  echo -e "\nCleaning up test bucket"
+  gsutil rm -r "$BUCKET/bigbucket" > /dev/null 2>&1
+
+  echo "Cleaning up bigbucket processes"
+  for process in $(pgrep bigbucket); do
+    kill "$process"
+  done
+  echo "Done"
+}
+
+trap cleanup ERR
 
 # Get directory of script no matter where it's called from
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-echo "Running bigbucket server"
-$DIR/../bin/bigbucket --bucket "$1" > /dev/null 2>&1 &
-echo
+echo -e "\nRunning bigbucket server"
+$DIR/../bin/bigbucket --bucket "$BUCKET" > /dev/null 2>&1 &
 
-echo "Running row tests"
+echo -e "\nRunning row tests"
 go test $DIR/row_test.go
-echo
 
-echo "Running column tests"
+echo -e "\nRunning column tests"
 go test $DIR/column_test.go
-echo
 
-echo "Running table tests"
+echo -e "\nRunning table tests"
 go test $DIR/table_test.go
-echo
 
-echo "Running bigbucket cleaner"
-$DIR/../bin/bigbucket --bucket "$1" --cleaner --cleaner-interval 3 > /dev/null 2>&1 &
-echo
+echo -e "\nRunning bigbucket cleaner"
+$DIR/../bin/bigbucket --bucket "$BUCKET" --cleaner --cleaner-interval 3 > /dev/null 2>&1 &
 
-echo "Running bigbucket cleaner tests"
+echo -e "\nRunning bigbucket cleaner tests"
 go test $DIR/cleaner_test.go
-echo
 
-echo "Killing bigbucket cleaner"
+echo -e "\nKilling bigbucket cleaner"
 kill "$!"
-echo
 
-echo "Running bigbucket cleaner as HTTP server"
-$DIR/../bin/bigbucket --bucket "$1" --cleaner-http --port 8081 > /dev/null 2>&1 &
-echo
+echo -e "\nRunning bigbucket cleaner as HTTP server"
+$DIR/../bin/bigbucket --bucket "$BUCKET" --cleaner-http --port 8081 > /dev/null 2>&1 &
 
-echo "Running HTTP cleaner tests"
+echo -e "\nRunning HTTP cleaner tests"
 go test $DIR/cleaner_http_test.go
-echo
 
-echo "Cleaning up test bucket"
-gsutil rm -r "$1/bigbucket"
-
-for process in $(pgrep bigbucket); do
-  kill "$process"
-done
+cleanup
 
 

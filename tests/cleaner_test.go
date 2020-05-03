@@ -44,7 +44,7 @@ func deleteColumn() error {
 		return err
 	}
 
-	if len(dataColumn["columns"].([]interface{})) != 3 && dataColumn["columns"].([]interface{})[0] != "col2" {
+	if len(dataColumn["columns"].([]interface{})) != 3 || dataColumn["columns"].([]interface{})[0] != "col2" {
 		return errors.New("deleteColumn column was not marked as deleted")
 	}
 

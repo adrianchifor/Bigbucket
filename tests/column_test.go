@@ -36,7 +36,7 @@ func listColumns() error {
 		return err
 	}
 
-	if len(data["columns"].([]interface{})) != 4 && data["columns"].([]interface{})[0] != "col1" {
+	if len(data["columns"].([]interface{})) != 4 || data["columns"].([]interface{})[0] != "col1" {
 		return errors.New("listColumns returned columns do not match those set")
 	}
 	return nil
