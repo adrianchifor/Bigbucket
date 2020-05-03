@@ -1,4 +1,4 @@
-.PHONY: fmt download build docker docker_push clean
+.PHONY: fmt download build test docker docker_push clean
 
 all: fmt download build
 
@@ -10,6 +10,13 @@ download:
 
 build:
 	go build -o bin/bigbucket
+
+test: fmt download build
+ifeq ($(bucket),)
+	@echo Please pass bucket name to use for tests e.g. make test bucket=gs://<bucket-name>
+else
+	tests/run_tests.sh $(bucket)
+endif
 
 docker:
 	docker build -t bigbucket .
