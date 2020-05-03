@@ -50,7 +50,7 @@ func parseExclusiveRequestParams(c *gin.Context, firstParam string, secondParam 
 	firstParamVal := strings.TrimSpace(c.Query(firstParam))
 	secondParamVal := strings.TrimSpace(c.Query(secondParam))
 
-	if firstParamVal != "" && firstParamVal != "" {
+	if firstParamVal != "" && secondParamVal != "" {
 		c.JSON(400, gin.H{
 			"error": fmt.Sprintf("Please provide only one of '%s' or '%s' as a querystring parameter", firstParam, secondParam),
 		})
