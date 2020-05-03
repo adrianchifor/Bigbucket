@@ -229,7 +229,7 @@ func readRowsColumns() error {
 	}
 	for col, _ := range data["key1"] {
 		if col != "col1" && col != "col2" {
-			return errors.New("readRowsColumns returned columns other than requested")
+			return errors.New("readRowsColumns got columns other than requested")
 		}
 	}
 	return nil

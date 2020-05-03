@@ -34,7 +34,7 @@ func listTables() error {
 	}
 
 	if len(data["tables"]) != 1 || data["tables"][0] != "test1" {
-		return errors.New("listTables returned tables do not match those set")
+		return errors.New("listTables tables do not match those set")
 	}
 	return nil
 }

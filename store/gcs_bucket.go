@@ -14,7 +14,6 @@ import (
 
 var (
 	BucketName string
-
 	GoogBucket storage.BucketHandle
 )
 

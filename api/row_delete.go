@@ -22,7 +22,8 @@ func deleteRows(c *gin.Context) {
 	}
 	if rowKey == "" && rowPrefix == "" {
 		c.JSON(400, gin.H{
-			"error": "Please provide one of 'key' or 'prefix' as a querystring parameter. To delete the table use /api/table",
+			"error": "Please provide one of 'key' or 'prefix' as a querystring parameter. " +
+				"To delete the table use DELETE /api/table?table=<table-name>",
 		})
 		return
 	}
