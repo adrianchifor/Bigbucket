@@ -18,12 +18,18 @@ var (
 )
 
 func InitGoog() {
-	gcsClient, err := storage.NewClient(context.Background())
+	ctx := context.Background()
+	gcsClient, err := storage.NewClient(ctx)
 	if err != nil {
 		log.Fatalf("Failed to create Google Storage client: %v", err)
 	}
 
 	GoogBucket = *gcsClient.Bucket(BucketName)
+
+	_, err = GoogBucket.Attrs(ctx)
+	if err != nil {
+		log.Fatalf("Failed to initialize Google Storage Bucket: %v", err)
+	}
 }
 
 func ListObjects(prefix string, delimiter string, limit int) ([]string, error) {
