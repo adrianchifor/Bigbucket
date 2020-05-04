@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"bigbucket/store"
+	"bigbucket/utils"
 	"github.com/adrianchifor/go-parallel"
 	"github.com/gin-gonic/gin"
 )
@@ -109,7 +110,14 @@ func deleteRows(c *gin.Context) {
 
 	successMsg := fmt.Sprintf("Row with key '%s' was deleted from table '%s'", rowKey, params["table"])
 	if rowPrefix != "" {
-		successMsg = fmt.Sprintf("Rows with key prefix '%s' were deleted from table '%s'", rowPrefix, params["table"])
+		rowsFound := []string{}
+		for _, object := range objects {
+			objectKey := strings.Split(object, "/")[2]
+			if utils.Search(rowsFound, objectKey) == -1 {
+				rowsFound = append(rowsFound, objectKey)
+			}
+		}
+		successMsg = fmt.Sprintf("%d rows with key prefix '%s' were deleted from table '%s'", len(rowsFound), rowPrefix, params["table"])
 	}
 	c.JSON(200, gin.H{
 		"success": successMsg,
