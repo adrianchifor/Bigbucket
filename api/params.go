@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	invalidChars = []string{"\n", "\r", "\t", "\b", "#", "[", "]", "?", "/"}
+	invalidChars = []string{"\n", "\r", "\t", "\b", "#", "[", "]", "*", "?", "/"}
 )
 
 func parseRequiredRequestParams(c *gin.Context, params ...string) (map[string]string, error) {
