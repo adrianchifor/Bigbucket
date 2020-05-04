@@ -91,7 +91,8 @@ func setRowsBadParams() error {
 		return errors.New("setRowsBadParams /api/row POST (no table) response status code is not 400")
 	}
 
-	resp, err = http.Post("http://127.0.0.1:8080/api/row?table=test1", "application/json", bytes.NewBuffer([]byte("")))
+	resp, err = http.Post("http://127.0.0.1:8080/api/row?table=test1", "application/json",
+		bytes.NewBuffer([]byte("")))
 	if err != nil {
 		return err
 	}
@@ -105,12 +106,28 @@ func setRowsBadParams() error {
 	if err != nil {
 		return err
 	}
-	resp, err = http.Post("http://127.0.0.1:8080/api/row?table=test1&key=key0", "application/json", bytes.NewBuffer(reqBody))
+	resp, err = http.Post("http://127.0.0.1:8080/api/row?table=test1&key=key0", "application/json",
+		bytes.NewBuffer(reqBody))
 	if err != nil {
 		return err
 	}
 	if resp.StatusCode != 400 {
-		return errors.New("setRowsBadParams /api/row POST (bad json) response status code is not 400")
+		return errors.New("setRowsBadParams /api/row POST (bad json, int value) response status code is not 400")
+	}
+
+	reqBody, err = json.Marshal(map[string]interface{}{
+		"col1/": "test", // Invalid column name
+	})
+	if err != nil {
+		return err
+	}
+	resp, err = http.Post("http://127.0.0.1:8080/api/row?table=test1&key=key0", "application/json",
+		bytes.NewBuffer(reqBody))
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 400 {
+		return errors.New("setRowsBadParams /api/row POST (bad json, invalid column) response status code is not 400")
 	}
 
 	return nil

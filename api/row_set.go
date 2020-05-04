@@ -31,22 +31,37 @@ func setRow(c *gin.Context) {
 		return
 	}
 
+	cleanedJsonPayload := make(map[string]string)
+	for column, value := range jsonPayload {
+		column := strings.TrimSpace(column)
+		if column == "" {
+			c.JSON(400, gin.H{
+				"error": "Columns cannot be empty",
+			})
+			return
+		}
+		if !isObjectNameValid(column) {
+			c.JSON(400, gin.H{
+				"error": fmt.Sprintf("Columns cannot start with '.' nor contain the following characters: %s", invalidChars),
+			})
+			return
+		}
+
+		cleanedJsonPayload[column] = value
+	}
+
 	columnsJobPool := parallel.CustomJobPool(parallel.JobPoolConfig{
-		WorkerCount:  len(jsonPayload),
-		JobQueueSize: len(jsonPayload) * 10,
+		WorkerCount:  len(cleanedJsonPayload),
+		JobQueueSize: len(cleanedJsonPayload) * 10,
 	})
 	defer columnsJobPool.Close()
 
 	writesFailed := map[string]error{}
 	writesFailedMutex := &sync.Mutex{}
 
-	for column, value := range jsonPayload {
-		column := strings.TrimSpace(column)
-		if column == "" {
-			continue
-		}
+	for column, value := range cleanedJsonPayload {
+		column := column
 		value := value
-
 		columnsJobPool.AddJob(func() {
 			err := store.WriteObject(fmt.Sprintf("bigbucket/%s/%s/%s", params["table"], params["key"], column), []byte(value))
 			if err != nil {

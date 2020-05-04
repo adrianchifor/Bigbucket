@@ -69,7 +69,7 @@ func parseExclusiveRequestParams(c *gin.Context, firstParam string, secondParam 
 func validateParam(c *gin.Context, paramValue string) error {
 	if !isObjectNameValid(paramValue) {
 		c.JSON(400, gin.H{
-			"error": fmt.Sprintf("parameters cannot start with '.' nor contain the following characters: %s", invalidChars),
+			"error": fmt.Sprintf("Parameters cannot start with '.' nor contain the following characters: %s", invalidChars),
 		})
 		return errors.New("Failed to validate querystring parameter")
 	}
