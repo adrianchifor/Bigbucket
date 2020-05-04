@@ -43,6 +43,8 @@ Here's an overview diagram of how Bigbucket would look like deployed and serving
 
 - **Bigbucket Cleaner** removes tables and columns that have been marked for deletion. It's deployed as a single-container private Cloud Run service, with appropriate bucket permissions, triggered every hour by a Cloud Scheduler job.
 
+To run this yourself, check out the [Running in Cloud](#running-in-cloud) section.
+
 <img src="./docs/overview.png">
 
 Also here's a visual representation of the data model and the terminology behind it. Compared to Bigtable, the current model has 2 key differences:
@@ -319,12 +321,35 @@ Response:
 Create a [GCS bucket](https://cloud.google.com/storage/docs/creating-buckets#storage-create-bucket-gsutil)
 
 ```
-gsutil mb -p <your-project> gs://<bucket-name>/
+gsutil mb -p <your-project> -l EUROPE-WEST1 gs://<bucket-name>/
 ```
 
 ### Running locally
 
+#### Binary
+
+```
+$ git clone https://github.com/adrianchifor/Bigbucket
+$ cd Bigbucket
+$ make
+```
+
 API
+
+```
+./bin/bigbucket --bucket gs://<bucket-name>
+```
+
+Cleaner
+
+```
+./bin/bigbucket --bucket gs://<bucket-name> --cleaner --cleaner-interval 30
+```
+
+#### Docker
+
+API
+
 ```
 docker run -d --name "bigbucket-api" \
   -e BUCKET=gs://<bucket-name> \
@@ -334,6 +359,7 @@ docker run -d --name "bigbucket-api" \
 ```
 
 Cleaner
+
 ```
 docker run -d --name "bigbucket-cleaner" \
   -e BUCKET=gs://<bucket-name> \
@@ -384,6 +410,71 @@ $ docker logs bigbucket-cleaner
 $ docker kill bigbucket-api
 $ docker kill bigbucket-cleaner
 ```
+
+### Running in Cloud
+
+There's an example [run.yaml](./run.yaml) file on how to deploy Bigbucket to GCP, like in the first diagram in [Architecture and data model](#architecture-and-data-model), using [run-marathon](https://github.com/adrianchifor/run-marathon).
+
+Modify `run.yaml` to suit your environment
+
+```
+$ git clone https://github.com/adrianchifor/Bigbucket
+$ cd Bigbucket
+$ vim run.yaml
+```
+
+Replace all occurances of `your_*` with your own project, region, bucket etc.
+
+Let's deploy it
+
+```
+# Install run-marathon
+$ pip3 install --user run-marathon
+
+$ run check
+Cloud Run, Build, Container Registry, PubSub and Scheduler APIs are enabled. All good!
+
+# Build and push Docker image to GCR
+$ run build
+...
+
+# Create service accounts, attach IAM roles, deploy to Cloud Run and create Cloud Scheduler job
+$ run deploy
+...
+
+# Get the endpoint of your API
+$ run ls 
+   SERVICE        REGION        URL                        LAST DEPLOYED BY   LAST DEPLOYED AT
+✔  bigbucket-api  europe-west1  https://YOUR_API_ENDPOINT  you                some time
+```
+
+Let's test it
+
+```
+# Use your account identity token to authenticate to the private API endpoint
+$ alias gcurl='curl --header "Authorization: Bearer $(gcloud auth print-identity-token)"'
+
+# Set a row
+$ gcurl -X POST "https://YOUR_API_ENDPOINT/api/row?table=test&key=key1" \
+  -d '{"foo": "hello", "bar": "world"}' | jq .
+
+{
+  "success": "Set row key 'key1' in table 'test'"
+}
+
+# Get the row
+$ gcurl -X GET "https://YOUR_API_ENDPOINT/api/row?table=test&key=key1" | jq .
+
+{
+  "key1": {
+    "bar": "world",
+    "foo": "hello"
+  }
+}
+```
+
+Nice! Now you've got load balanced, auto-scaling private Bigbucket API with TLS, and a Bigbucket Cleaner container triggered every hour.
+
 
 ## Configuration
 

@@ -1,0 +1,31 @@
+# Config for https://github.com/adrianchifor/run-marathon
+project: your_project
+region: your_region
+
+allow-invoke:
+  - user:your_user@company.com
+
+bigbucket-api:
+  dir: .
+  image: gcr.io/${project}/bigbucket:latest
+  concurrency: 50
+  timeout: 30
+  env:
+    BUCKET: gs://your_bucket
+  iam-roles:
+    # Create/assign role manually if you want more granularity
+    # SA will be bigbucket-api-sa@your_project.iam.gserviceaccount.com
+    - roles/storage.objectAdmin
+
+bigbucket-cleaner:
+  image: gcr.io/${project}/bigbucket:latest
+  max-instances: 1
+  cron:
+    schedule: 0 * * * *
+  env:
+    BUCKET: gs://your_bucket
+    CLEANER_HTTP: "true"
+  iam-roles:
+    # Create/assign role manually if you want more granularity
+    # SA will be bigbucket-cleaner-sa@your_project.iam.gserviceaccount.com
+    - roles/storage.objectAdmin
