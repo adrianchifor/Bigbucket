@@ -22,7 +22,7 @@ func getRows(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	columnsCountMap, err := parseOptionalRequestParams(c, "columns", "count")
+	columnsCountMap, err := parseOptionalRequestParams(c, "columns", "limit")
 	if err != nil {
 		return
 	}
@@ -50,12 +50,12 @@ func getRows(c *gin.Context) {
 		return
 	}
 
-	rowsCountInt := 0
-	if params["count"] != "" {
-		if n, err := strconv.Atoi(params["count"]); err == nil {
-			rowsCountInt = n
+	rowsLimitInt := 0
+	if params["limit"] != "" {
+		if n, err := strconv.Atoi(params["limit"]); err == nil {
+			rowsLimitInt = n
 		} else {
-			c.JSON(400, gin.H{"error": "'count' parameter has to be an integer"})
+			c.JSON(400, gin.H{"error": "'limit' parameter has to be an integer"})
 			return
 		}
 	}
@@ -112,10 +112,10 @@ func getRows(c *gin.Context) {
 
 			resultsMutex.Lock()
 			if _, exists := results[objectKey]; !exists {
-				if rowsCountInt > 0 {
+				if rowsLimitInt > 0 {
 					rowsAddedMutex.Lock()
-					if rowsAdded == rowsCountInt {
-						// End goroutine if max row count is reached
+					if rowsAdded == rowsLimitInt {
+						// End goroutine if max row limit is reached
 						rowsAddedMutex.Unlock()
 						resultsMutex.Unlock()
 						return

@@ -31,7 +31,7 @@ func TestRows(t *testing.T) {
 	if err := readRowsWithColumns(); err != nil {
 		t.Error(err)
 	}
-	if err := readRowsWithCount(); err != nil {
+	if err := readRowsWithLimit(); err != nil {
 		t.Error(err)
 	}
 	if err := readRowsBadParams(); err != nil {
@@ -258,13 +258,13 @@ func readRowsWithColumns() error {
 	return nil
 }
 
-func readRowsWithCount() error {
-	resp, err := http.Get("http://127.0.0.1:8080/api/row?table=test1&count=2")
+func readRowsWithLimit() error {
+	resp, err := http.Get("http://127.0.0.1:8080/api/row?table=test1&limit=2")
 	if err != nil {
 		return err
 	}
 	if resp.StatusCode != 200 {
-		return errors.New("readRowsWithCount /api/row GET response status code is not 200")
+		return errors.New("readRowsWithLimit /api/row GET response status code is not 200")
 	}
 
 	defer resp.Body.Close()
@@ -274,7 +274,7 @@ func readRowsWithCount() error {
 		return err
 	}
 	if len(data) > 2 {
-		return errors.New("readRowsWithCount response body has more rows than count")
+		return errors.New("readRowsWithLimit response body has more rows than limit")
 	}
 	return nil
 }
