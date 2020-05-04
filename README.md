@@ -27,6 +27,15 @@ Features:
   - Auditing
   - Single region for lower latency or multi-region for more availability
 
+Sections:
+
+- [Architecture and data model](#architecture-and-data-model)
+- [API](#api)
+- [Running](#running)
+- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [TODO / Ideas](#todo--ideas)
+
 ## Architecture and data model
 
 Here's an overview diagram of how Bigbucket would look like deployed and serving requests on GCP. In this scenario:
@@ -62,6 +71,10 @@ _Note on naming_: Tables, columns and row keys follow [object name requirements 
 Endpoint: /api/table
 ```
 
+#### Create tables
+
+Schema is flexible by default so tables are automatically created when a new row is inserted. Schema enforcement is planned for the near future.
+
 #### List tables
 
 ```
@@ -77,12 +90,12 @@ Response:
 
 #### Delete table
 
-Tables marked for deletion will need to be garbage-collected by running Bigbucket in cleaner mode. See 'Running' section below.
+Tables marked for deletion will need to be garbage-collected by running Bigbucket in cleaner mode. See [Running](#running) section below.
 
 ```
 Querystring parameters:
 
-table (required) string
+  table (required)
 ```
 
 ```
@@ -100,14 +113,18 @@ Response:
 Endpoint: /api/column
 ```
 
+#### Create columns
+
+Schema is flexible by default so columns are automatically created when rows are inserted. Schema enforcement is planned for the near future.
+
 #### List columns
 
-As the schema can be flexible, this will list the columns from only the first row in your table.
+Because of schema flexibility, this will list the columns from only the first row in your table.
 
 ```
 Querystring parameters:
 
-table (required) string
+  table (required)
 ```
 
 ```
@@ -126,13 +143,13 @@ Response:
 
 #### Delete column
 
-Columns marked for deletion will need to be garbage-collected by running Bigbucket in cleaner mode. See 'Running' section below.
+Columns marked for deletion will need to be garbage-collected by running Bigbucket in cleaner mode. See [Running](#running) section below.
 
 ```
 Querystring parameters:
 
-table  (required) string
-column (required) string
+  table  (required)
+  column (required)
 ```
 
 ```
@@ -141,6 +158,159 @@ curl -X DELETE "http://localhost:8080/api/column?table=test&column=col1"
 Response:
 {
   "success": "Column 'col1' marked for deletion in table 'test'"
+}
+```
+
+### Row
+
+```
+Endpoint: /api/row
+```
+
+#### Count rows
+
+```
+Querystring parameters:
+
+  table  (required)
+
+  prefix (optional) // Row key prefix
+```
+
+```
+curl -X GET "http://localhost:8080/api/row/count?table=test"
+
+Response:
+{
+  "rowsCount": "100",
+  "table": "test"
+}
+```
+
+#### Read rows
+
+```
+Querystring parameters:
+
+  table   (required)
+
+  columns (optional) // Comma separated
+  limit   (optional) // Limit of rows returned
+
+  Exclusive (only one of):
+
+  key     (required) // Row key
+  prefix  (required) // Row key prefix
+```
+
+Read single row with specified columns (fastest read op):
+
+```
+curl -X GET "http://localhost:8080/api/row?table=test&key=key1&columns=col1,col2,col3"
+
+Response:
+{
+  "key1": {
+    "col1": "val",
+    "col2": "val",
+    "col3": "val"
+  }
+}
+```
+
+Read all rows:
+
+```
+curl -X GET "http://localhost:8080/api/row?table=test"
+
+Response:
+{
+  "key1": {
+    "col1": "val",
+    "col2": "val",
+    "col3": "val"
+  },
+  "key2": {
+    "col1": "val",
+    "col2": "val",
+    "col3": "val"
+  },
+  ...
+}
+```
+
+Read rows with prefix and limit:
+
+```
+curl -X GET "http://localhost:8080/api/row?table=test&prefix=key&limit=1"
+
+Response:
+{
+  "key1": {
+    "col1": "val",
+    "col2": "val",
+    "col3": "val"
+  }
+}
+```
+
+#### Set row
+
+```
+Querystring parameters:
+
+  table   (required)
+  key     (required) // Row key
+
+JSON Payload:
+
+  {
+    column (string): value (string),
+  }
+```
+
+```
+curl -X POST "http://localhost:8080/api/row?table=test&key=key5" \
+  -d '{"col1": "newVal", "col3": "newVal"}'
+
+Response:
+{
+  "success": "Set row key 'key5' in table 'test'"
+}
+```
+
+#### Delete rows
+
+```
+Querystring parameters:
+
+  table   (required)
+
+  Exclusive (only one of):
+
+  key     (required) // Row key
+  prefix  (required) // Row key prefix
+```
+
+Delete one row:
+
+```
+curl -X DELETE "http://localhost:8080/api/row?table=test&key=key5"
+
+Response:
+{
+  "success": "Row with key 'key5' was deleted from table 'test'"
+}
+```
+
+Delete rows with prefix:
+
+```
+curl -X DELETE "http://localhost:8080/api/row?table=test&prefix=key"
+
+Response:
+{
+  "success": "Rows with key prefix 'key' were deleted from table 'test'"
 }
 ```
 
