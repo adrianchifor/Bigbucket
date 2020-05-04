@@ -39,6 +39,7 @@ Sections:
 ## Architecture and data model
 
 Here's an overview diagram of how Bigbucket would look like deployed and serving requests on GCP. In this scenario:
+
 - **Bigbucket API** allows clients to interact with the wide column store through a RESTful API, like listing/counting/reading/writing/deleting rows, and listing/deleting columns and tables. It's deployed as an auto-scaling private Cloud Run service, with appropriate bucket permissions. Client requests will be load balanced between the containers and authenticated using their service account identity token ([GCP docs](https://cloud.google.com/run/docs/authenticating/developers)).
 
 - **Bigbucket Cleaner** removes tables and columns that have been marked for deletion. It's deployed as a single-container private Cloud Run service, with appropriate bucket permissions, triggered every hour by a Cloud Scheduler job.
@@ -329,9 +330,9 @@ gsutil mb -p <your-project> -l EUROPE-WEST1 gs://<bucket-name>/
 #### Binary
 
 ```
-$ git clone https://github.com/adrianchifor/Bigbucket
-$ cd Bigbucket
-$ make
+git clone https://github.com/adrianchifor/Bigbucket
+cd Bigbucket
+make
 ```
 
 API
@@ -418,9 +419,9 @@ There's an example [run.yaml](./run.yaml) file on how to deploy Bigbucket to GCP
 Modify `run.yaml` to suit your environment
 
 ```
-$ git clone https://github.com/adrianchifor/Bigbucket
-$ cd Bigbucket
-$ vim run.yaml
+git clone https://github.com/adrianchifor/Bigbucket
+cd Bigbucket
+vim run.yaml
 ```
 
 Replace all occurances of `your_*` with your own project, region, bucket etc.
@@ -443,7 +444,7 @@ $ run deploy
 ...
 
 # Get the endpoint of your API
-$ run ls 
+$ run ls
    SERVICE        REGION        URL                        LAST DEPLOYED BY   LAST DEPLOYED AT
 ✔  bigbucket-api  europe-west1  https://YOUR_API_ENDPOINT  you                some time
 ```
@@ -473,8 +474,7 @@ $ gcurl -X GET "https://YOUR_API_ENDPOINT/api/row?table=test&key=key1" | jq .
 }
 ```
 
-Nice! Now you've got load balanced, auto-scaling private Bigbucket API with TLS, and a Bigbucket Cleaner container triggered every hour.
-
+Nice! Now you've got load balanced, auto-scaling private Bigbucket API containers with TLS, and a Bigbucket Cleaner container triggered every hour.
 
 ## Configuration
 
@@ -612,7 +612,6 @@ Cleaning up test bucket
 Cleaning up bigbucket processes
 Done
 ```
-
 
 ## TODO / Ideas
 
