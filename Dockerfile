@@ -1,6 +1,6 @@
 FROM golang:1.14-alpine as builder
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git gcc musl-dev
 
 WORKDIR /go/src/bigbucket
 COPY . /go/src/bigbucket
