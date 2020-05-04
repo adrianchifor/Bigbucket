@@ -21,10 +21,6 @@ endif
 docker:
 	docker build -t bigbucket .
 
-docker_push: docker
-	docker tag bigbucket:latest adrianchifor/bigbucket:latest
-	docker push adrianchifor/bigbucket:latest
-
 clean:
 	rm -rf bin/
 	go clean -modcache
