@@ -316,6 +316,75 @@ Response:
 
 ## Running
 
+Create a [GCS bucket](https://cloud.google.com/storage/docs/creating-buckets#storage-create-bucket-gsutil)
+
+```
+gsutil mb -p <your-project> gs://<bucket-name>/
+```
+
+### Running locally
+
+API
+```
+docker run -d --name "bigbucket-api" \
+  -e BUCKET=gs://<bucket-name> \
+  -v ${HOME}/.config/gcloud:/root/.config/gcloud \
+  -p 8080:8080 \
+  adrianchifor/bigbucket:latest
+```
+
+Cleaner
+```
+docker run -d --name "bigbucket-cleaner" \
+  -e BUCKET=gs://<bucket-name> \
+  -e CLEANER=true \
+  -e CLEANER_INTERVAL=30 \
+  -v ${HOME}/.config/gcloud:/root/.config/gcloud \
+  adrianchifor/bigbucket:latest
+```
+
+We mount `${HOME}/.config/gcloud:/root/.config/gcloud` in both cases so the containers can use our local gcloud credentials to talk to the bucket.
+
+Let's test it
+
+```
+# Set a row
+$ curl -X POST "http://localhost:8080/api/row?table=test&key=key1" \
+  -d '{"foo": "hello", "bar": "world"}' | jq .
+
+{
+  "success": "Set row key 'key1' in table 'test'"
+}
+
+# Get the row
+$ curl -X GET "http://localhost:8080/api/row?table=test&key=key1" | jq .
+
+{
+  "key1": {
+    "bar": "world",
+    "foo": "hello"
+  }
+}
+
+# Delete the table
+$ curl -X DELETE "http://localhost:8080/api/table?table=test" | jq .
+
+{
+  "success": "Table 'test' marked for deletion"
+}
+
+# Check cleaner for garbage-collection
+$ docker logs bigbucket-cleaner
+
+2020/05/04 19:10:34 Running cleaner...
+2020/05/04 19:10:35 Running cleaner every 30 seconds...
+2020/05/04 19:18:36 Table 'test' cleaned up
+
+# Stop containers
+$ docker kill bigbucket-api
+$ docker kill bigbucket-cleaner
+```
+
 ## Configuration
 
 ### Flags
