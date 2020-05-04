@@ -182,7 +182,7 @@ curl -X GET "http://localhost:8080/api/row/count?table=test"
 
 Response:
 {
-  "rowsCount": "100",
+  "rowsCount": "5",
   "table": "test"
 }
 ```
@@ -310,7 +310,7 @@ curl -X DELETE "http://localhost:8080/api/row?table=test&prefix=key"
 
 Response:
 {
-  "success": "Rows with key prefix 'key' were deleted from table 'test'"
+  "success": "4 rows with key prefix 'key' were deleted from table 'test'"
 }
 ```
 
