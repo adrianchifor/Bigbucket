@@ -1,8 +1,8 @@
 # Bigbucket
 
-Bigbucket is a serverless NoSQL database with a focus on scalability, availability and simplicity. It has a Bigtable-style data model with storage backed by Cloud Storage Buckets.
+Bigbucket is a serverless NoSQL database with a focus on scalability, availability and simplicity. It has a Bigtable-style data model with storage backed by a Cloud Storage Bucket.
 
-It's serverless in the sense of the storage layer being fully managed and the API/controller layer being stateless and horizontally scalable, which makes it ideal to run in serverless offerings like Google Cloud Run/Functions or AWS Lambda. No servers/disks to think about, no masters/slaves, no sharding; just create a bucket and point a binary to it.
+It's serverless in the sense of the storage layer being fully managed and the API layer being stateless and horizontally scalable, which makes it ideal to run in serverless offerings like Google Cloud Run/Functions or AWS Lambda. No servers/disks to manage, no masters/slaves, no sharding; just create a bucket and point a binary to it.
 
 The goal of the project is to offer a simple, easy to manage wide column database, with a lower barrier to entry compared to Bigtable and Cassandra, to folks who care more about scalability and availability rather than maximum performance.
 
@@ -11,7 +11,7 @@ _Note_: The project is currently in alpha and under development. I would not rec
 Features:
 
 - Bigtable-style data model (wide column / two-dimensional KV)
-- Storage backed by Cloud Storage Buckets ([GCS](https://cloud.google.com/storage/) available, S3 planned)
+- Storage backed by a Cloud Storage Bucket ([GCS](https://cloud.google.com/storage/) available, S3 planned)
 - Fully stateless frontend with a simple RESTful API
 - Horizontally scalable. Need more throughput? Just add more replicas and raise Cloud Storage quotas if necessary
 - (WIP) Flexible data schema with the option to enforce at API layer
@@ -53,6 +53,96 @@ A few things to keep in mind when designing your schema are:
 - Write-heavy data should be kept in separate columns as there is an update limit of once per second for the same cell ([GCS quotas](https://cloud.google.com/storage/quotas#objects)).
 
 ## API
+
+_Note on naming_: Tables, columns and row keys follow [object name requirements from Google Cloud Storage](https://cloud.google.com/storage/docs/naming-objects). In short, Bigbucket API will return "HTTP 400 Bad Request" when trying to use tables, columns or row keys starting with dot "." or containing: \n, \r, \t, \b, #, [, ], *, ?, /
+
+### Table
+
+```
+Endpoint: /api/table
+```
+
+#### List tables
+
+```
+curl -X GET "http://localhost:8080/api/table"
+
+Response:
+{
+  "tables": [
+    "test"
+  ]
+}
+```
+
+#### Delete table
+
+Tables marked for deletion will need to be garbage-collected by running Bigbucket in cleaner mode. See 'Running' section below.
+
+```
+Querystring parameters:
+
+table (required) string
+```
+
+```
+curl -X DELETE "http://localhost:8080/api/table?table=test"
+
+Response:
+{
+  "success": "Table 'test' marked for deletion"
+}
+```
+
+### Column
+
+```
+Endpoint: /api/column
+```
+
+#### List columns
+
+As the schema can be flexible, this will list the columns from only the first row in your table.
+
+```
+Querystring parameters:
+
+table (required) string
+```
+
+```
+curl -X GET "http://localhost:8080/api/column?table=test"
+
+Response:
+{
+  "columns": [
+    "col1",
+    "col2",
+    "col3"
+  ],
+  "table": "test"
+}
+```
+
+#### Delete column
+
+Columns marked for deletion will need to be garbage-collected by running Bigbucket in cleaner mode. See 'Running' section below.
+
+```
+Querystring parameters:
+
+table  (required) string
+column (required) string
+```
+
+```
+curl -X DELETE "http://localhost:8080/api/column?table=test&column=col1"
+
+Response:
+{
+  "success": "Column 'col1' marked for deletion in table 'test'"
+}
+```
 
 ## Running
 
