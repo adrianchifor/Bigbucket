@@ -1,5 +1,7 @@
 # Bigbucket
 
+![Docker](https://github.com/adrianchifor/Bigbucket/workflows/Publish%20Docker/badge.svg)
+
 Bigbucket is a serverless NoSQL database with a focus on scalability, availability and simplicity. It has a Bigtable-style data model with storage backed by a Cloud Storage Bucket.
 
 It's serverless in the sense of the storage layer being fully managed and the API layer being stateless and horizontally scalable, which makes it ideal to run in serverless offerings like Google Cloud Run/Functions or AWS Lambda. No servers/disks to manage, no masters/slaves, no sharding; just create a bucket and point a binary to it.
