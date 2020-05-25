@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sort"
 	"testing"
 )
 
@@ -275,6 +276,14 @@ func readRowsWithLimit() error {
 	}
 	if len(data) > 2 {
 		return errors.New("readRowsWithLimit response body has more rows than limit")
+	}
+	// Check keys returned are sorted
+	keys := []string{}
+	for key, _ := range data {
+		keys = append(keys, key)
+	}
+	if !sort.StringsAreSorted(keys) {
+		return errors.New("readRowsWithLimit response keys are not sorted")
 	}
 	return nil
 }

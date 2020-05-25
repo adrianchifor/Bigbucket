@@ -95,43 +95,37 @@ func getRows(c *gin.Context) {
 	defer rowsJobPool.Close()
 
 	rowsAdded := 0
-	rowsAddedMutex := &sync.Mutex{}
 	resultsMutex := &sync.Mutex{}
 
 	for _, object := range objects {
 		object := object
-		rowsJobPool.AddJob(func() {
-			// End goroutine if object is not column
-			if strings.HasSuffix(object, "/") || strings.Count(object, "/") < 3 {
-				return
-			}
+		if strings.HasSuffix(object, "/") || strings.Count(object, "/") < 3 {
+			// Skip if object is not column
+			continue
+		}
+		objectSplit := strings.Split(object, "/")
+		objectKey := objectSplit[2]
+		objectColumn := objectSplit[3]
+		if len(columnsList) > 0 && utils.Search(columnsList, objectColumn) == -1 {
+			// Skip if current column is not in specified columns
+			continue
+		}
 
-			objectSplit := strings.Split(object, "/")
-			objectKey := objectSplit[2]
-			objectColumn := objectSplit[3]
-
-			resultsMutex.Lock()
-			if _, exists := results[objectKey]; !exists {
-				if rowsLimitInt > 0 {
-					rowsAddedMutex.Lock()
-					if rowsAdded == rowsLimitInt {
-						// End goroutine if max row limit is reached
-						rowsAddedMutex.Unlock()
-						resultsMutex.Unlock()
-						return
-					}
-					rowsAdded++
-					rowsAddedMutex.Unlock()
+		resultsMutex.Lock()
+		if _, exists := results[objectKey]; !exists {
+			if rowsLimitInt > 0 {
+				if rowsAdded == rowsLimitInt {
+					// Break loop if max row limit is reached
+					resultsMutex.Unlock()
+					break
 				}
-				results[objectKey] = make(map[string]string)
+				rowsAdded++
 			}
-			resultsMutex.Unlock()
+			results[objectKey] = make(map[string]string)
+		}
+		resultsMutex.Unlock()
 
-			if len(columnsList) > 0 && utils.Search(columnsList, objectColumn) == -1 {
-				// End goroutine if current column is not in the specified columns
-				return
-			}
-
+		rowsJobPool.AddJob(func() {
 			columnValue, err := store.ReadObject(object)
 			if err != nil {
 				log.Print(err, fmt.Sprintf(" (%s)", object))
