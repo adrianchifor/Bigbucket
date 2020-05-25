@@ -38,6 +38,15 @@ func TestRows(t *testing.T) {
 	if err := readRowsBadParams(); err != nil {
 		t.Error(err)
 	}
+	if err := listRows(); err != nil {
+		t.Error(err)
+	}
+	if err := listRowsWithPrefix(); err != nil {
+		t.Error(err)
+	}
+	if err := listRowsBadParams(); err != nil {
+		t.Error(err)
+	}
 	if err := countRows(); err != nil {
 		t.Error(err)
 	}
@@ -303,6 +312,60 @@ func readRowsBadParams() error {
 	}
 	if resp.StatusCode != 400 {
 		return errors.New("readRowsBadParams /api/row GET (both key and prefix) response status code is not 400")
+	}
+
+	return nil
+}
+
+func listRows() error {
+	resp, err := http.Get("http://127.0.0.1:8080/api/row/list?table=test1")
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 200 {
+		return errors.New("listRows /api/row/list GET response status code is not 200")
+	}
+
+	defer resp.Body.Close()
+	var data map[string][]string
+	json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		return err
+	}
+	if len(data["rowKeys"]) != 20 {
+		return errors.New("listRows count doesn't match what was set")
+	}
+	return nil
+}
+
+func listRowsWithPrefix() error {
+	resp, err := http.Get("http://127.0.0.1:8080/api/row/list?table=test1&prefix=key")
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 200 {
+		return errors.New("listRowsWithPrefix /api/row/list GET response status code is not 200")
+	}
+
+	defer resp.Body.Close()
+	var data map[string][]string
+	json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		return err
+	}
+	if len(data["rowKeys"]) != 10 {
+		return errors.New("listRowsWithPrefix count doesn't match what was set")
+	}
+	return nil
+}
+
+func listRowsBadParams() error {
+	resp, err := http.Get("http://127.0.0.1:8080/api/row/list")
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 400 {
+		return errors.New("listRowsBadParams /api/row/list GET (no table) response status code is not 400")
 	}
 
 	return nil

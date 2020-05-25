@@ -149,34 +149,6 @@ func getRows(c *gin.Context) {
 	c.JSON(200, results)
 }
 
-func getRowsCount(c *gin.Context) {
-	tableMap, err := parseRequiredRequestParams(c, "table")
-	if err != nil {
-		return
-	}
-	prefixMap, err := parseOptionalRequestParams(c, "prefix")
-	if err != nil {
-		return
-	}
-	params := utils.MergeMaps(tableMap, prefixMap)
-
-	keysPath := fmt.Sprintf("bigbucket/%s/", params["table"])
-	if params["prefix"] != "" {
-		keysPath = fmt.Sprintf("bigbucket/%s/%s", params["table"], params["prefix"])
-	}
-
-	rows, err := store.ListObjects(keysPath, "/", 0)
-	if err != nil {
-		log.Print(err)
-		c.JSON(500, gin.H{
-			"error": "Internal error, check server logs",
-		})
-		return
-	}
-
-	c.JSON(200, gin.H{"table": params["table"], "rowsCount": strconv.Itoa(len(rows))})
-}
-
 func getRowColumns(table string, rowKey string, columns []string) (map[string]string, error) {
 	results := make(map[string]string)
 	resultsMutex := &sync.Mutex{}
@@ -208,4 +180,56 @@ func getRowColumns(table string, rowKey string, columns []string) (map[string]st
 	}
 
 	return results, nil
+}
+
+func getRowsCount(c *gin.Context) {
+	rows, table, err := listRowKeys(c)
+	if err != nil {
+		return
+	}
+
+	c.JSON(200, gin.H{"table": table, "rowsCount": strconv.Itoa(len(rows))})
+}
+
+func listRows(c *gin.Context) {
+	rows, table, err := listRowKeys(c)
+	if err != nil {
+		return
+	}
+
+	rowKeys := []string{}
+	for _, row := range rows {
+		rowKey := strings.Split(row, "/")[2]
+		rowKeys = append(rowKeys, rowKey)
+	}
+
+	c.JSON(200, gin.H{"table": table, "rowKeys": rowKeys})
+}
+
+func listRowKeys(c *gin.Context) ([]string, string, error) {
+	tableMap, err := parseRequiredRequestParams(c, "table")
+	if err != nil {
+		return nil, "", err
+	}
+	prefixMap, err := parseOptionalRequestParams(c, "prefix")
+	if err != nil {
+		return nil, "", err
+	}
+	params := utils.MergeMaps(tableMap, prefixMap)
+
+	keysPath := fmt.Sprintf("bigbucket/%s/", params["table"])
+	if params["prefix"] != "" {
+		keysPath = fmt.Sprintf("bigbucket/%s/%s", params["table"], params["prefix"])
+	}
+
+	rows, err := store.ListObjects(keysPath, "/", 0)
+	if err != nil {
+		log.Print(err)
+		c.JSON(500, gin.H{
+			"error": "Internal error, check server logs",
+		})
+		return nil, "", err
+	}
+
+	return rows, params["table"], nil
 }

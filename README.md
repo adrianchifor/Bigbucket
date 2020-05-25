@@ -193,6 +193,26 @@ Response:
 }
 ```
 
+#### List row keys
+
+```
+Querystring parameters:
+
+  table  (required)
+
+  prefix (optional) // Row key prefix
+```
+
+```
+curl -X GET "http://localhost:8080/api/row/list?table=test"
+
+Response:
+{
+  "rowKeys": ["key1", "key2", "key3", "key4", "key5"],
+  "table": "test"
+}
+```
+
 #### Read rows
 
 ```
