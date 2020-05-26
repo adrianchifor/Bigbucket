@@ -6,7 +6,7 @@ allow-invoke:
   - user:your_user@company.com
 
 bigbucket-api:
-  dir: .
+  dir: ..
   image: gcr.io/${project}/bigbucket:latest
   concurrency: 50
   timeout: 30

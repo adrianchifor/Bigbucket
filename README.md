@@ -444,13 +444,13 @@ $ docker kill bigbucket-cleaner
 
 ### Running in Cloud
 
-There's an example [run.yaml](./run.yaml) file on how to deploy Bigbucket to GCP, like in the first diagram in [Architecture and data model](#architecture-and-data-model), using [run-marathon](https://github.com/adrianchifor/run-marathon).
+There's an example [deploy/run.yaml](./deploy/run.yaml) file on how to deploy Bigbucket to GCP, like in the first diagram in [Architecture and data model](#architecture-and-data-model), using [run-marathon](https://github.com/adrianchifor/run-marathon).
 
-Modify `run.yaml` to suit your environment
+Modify [deploy/run.yaml](./deploy/run.yaml) to suit your environment
 
 ```
 git clone https://github.com/adrianchifor/Bigbucket
-cd Bigbucket
+cd Bigbucket/deploy
 vim run.yaml
 ```
 
@@ -508,7 +508,7 @@ Nice! Now you've got load balanced, auto-scaling private Bigbucket API container
 
 ### Running in Kubernetes
 
-Change the `BUCKET` environment variable in `deploy/k8s.yaml` and run:
+Change the `BUCKET` environment variable in [deploy/k8s.yaml](./deploy/k8s.yaml) and run:
 
 ```
 $ kubectl apply -f deploy/k8s.yaml
