@@ -35,6 +35,9 @@ Sections:
 - [API](#api)
 - [Clients](#clients)
 - [Running](#running)
+  - [Locally](#running-locally)
+  - [Cloud Run](#running-in-cloud)
+  - [Kubernetes](#running-in-kubernetes)
 - [Configuration](#configuration)
 - [Contributing](#contributing)
 - [TODO / Ideas](#todo--ideas)
@@ -502,6 +505,22 @@ $ gcurl -X GET "https://YOUR_API_ENDPOINT/api/row?table=test&key=key1" | jq .
 ```
 
 Nice! Now you've got load balanced, auto-scaling private Bigbucket API containers with TLS, and a Bigbucket Cleaner container triggered every hour.
+
+### Running in Kubernetes
+
+Change the `BUCKET` environment variable in `deploy/k8s.yaml` and run:
+
+```
+$ kubectl apply -f deploy/k8s.yaml
+
+deployment.apps/bigbucket configured
+service/bigbucket configured
+cronjob.batch/bigbucket-cleaner configured
+```
+
+This will deploy the Bigbucket API as a Deployment + Service and the Bigbucket Cleaner as an hourly CronJob.
+
+In terms of bucket access, make sure the pods have appropriate permissions to read/write/delete objects in the bucket. If you run on GKE it's recommended that you make use of [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity).
 
 ## Configuration
 

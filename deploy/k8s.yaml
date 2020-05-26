@@ -1,0 +1,86 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bigbucket
+  labels:
+    app: bigbucket
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: bigbucket
+  template:
+    metadata:
+      labels:
+        app: bigbucket
+    spec:
+      containers:
+        - name: bigbucket
+          image: adrianchifor/bigbucket:latest
+          imagePullPolicy: Always
+          env:
+            - name: BUCKET
+              value: gs://your-bucket
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bigbucket
+spec:
+  selector:
+    app: bigbucket
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: bigbucket-cleaner
+  labels:
+    app: bigbucket-cleaner
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 2
+  startingDeadlineSeconds: 60
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: bigbucket-cleaner
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: bigbucket-cleaner
+              image: adrianchifor/bigbucket:latest
+              imagePullPolicy: Always
+              env:
+                - name: BUCKET
+                  value: gs://your-bucket
+                - name: CLEANER
+                  value: "true"
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
