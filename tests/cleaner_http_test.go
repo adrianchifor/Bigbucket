@@ -39,9 +39,6 @@ func deleteTable() error {
 	defer resp.Body.Close()
 	var dataTable map[string][]string
 	json.NewDecoder(resp.Body).Decode(&dataTable)
-	if err != nil {
-		return err
-	}
 
 	if len(dataTable["tables"]) != 0 {
 		return errors.New("deleteTable table was not marked as deleted")

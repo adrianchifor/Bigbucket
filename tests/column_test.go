@@ -32,9 +32,6 @@ func listColumns() error {
 	defer resp.Body.Close()
 	var data map[string]interface{}
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
 
 	if len(data["columns"].([]interface{})) != 4 || data["columns"].([]interface{})[0] != "col1" {
 		return errors.New("listColumns columns do not match those set")

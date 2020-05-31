@@ -40,9 +40,6 @@ func deleteColumn() error {
 	defer resp.Body.Close()
 	var dataColumn map[string]interface{}
 	json.NewDecoder(resp.Body).Decode(&dataColumn)
-	if err != nil {
-		return err
-	}
 
 	if len(dataColumn["columns"].([]interface{})) != 3 || dataColumn["columns"].([]interface{})[0] != "col2" {
 		return errors.New("deleteColumn column was not marked as deleted")
@@ -62,9 +59,7 @@ func deleteColumn() error {
 	defer resp.Body.Close()
 	var dataRow map[string]map[string]string
 	json.NewDecoder(resp.Body).Decode(&dataRow)
-	if err != nil {
-		return err
-	}
+
 	if len(dataRow["rowkey1"]) != 3 {
 		return errors.New("deleteColumn response body still has all columns")
 	}

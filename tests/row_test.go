@@ -155,9 +155,7 @@ func readSingleRow() error {
 	defer resp.Body.Close()
 	var data map[string]map[string]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
+
 	if len(data) != 1 {
 		return errors.New("readSingleRow response body doesn't have exactly one row")
 	}
@@ -179,9 +177,7 @@ func readSingleRowColumn() error {
 	defer resp.Body.Close()
 	var data map[string]map[string]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
+
 	if len(data) != 1 {
 		return errors.New("readSingleRowColumn response body doesn't have exactly one row")
 	}
@@ -206,9 +202,7 @@ func readAllRows() error {
 	defer resp.Body.Close()
 	var data map[string]map[string]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
+
 	if len(data) < 20 {
 		return errors.New("readAllRows response body doesn't have all rows")
 	}
@@ -230,9 +224,7 @@ func readRowsWithPrefix() error {
 	defer resp.Body.Close()
 	var data map[string]map[string]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
+
 	if len(data) < 10 {
 		return errors.New("readRowsWithPrefix response body doesn't have all rows")
 	}
@@ -254,9 +246,7 @@ func readRowsWithColumns() error {
 	defer resp.Body.Close()
 	var data map[string]map[string]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
+
 	if len(data) < 20 {
 		return errors.New("readRowsWithColumns response body doesn't have all rows")
 	}
@@ -280,9 +270,7 @@ func readRowsWithLimit() error {
 	defer resp.Body.Close()
 	var data map[string]map[string]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
+
 	if len(data) > 2 {
 		return errors.New("readRowsWithLimit response body has more rows than limit")
 	}
@@ -329,9 +317,7 @@ func listRows() error {
 	defer resp.Body.Close()
 	var data map[string][]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
+
 	if len(data["rowKeys"]) != 20 {
 		return errors.New("listRows count doesn't match what was set")
 	}
@@ -350,9 +336,7 @@ func listRowsWithPrefix() error {
 	defer resp.Body.Close()
 	var data map[string][]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
+
 	if len(data["rowKeys"]) != 10 {
 		return errors.New("listRowsWithPrefix count doesn't match what was set")
 	}
@@ -383,9 +367,7 @@ func countRows() error {
 	defer resp.Body.Close()
 	var data map[string]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
+
 	if data["rowsCount"] != "20" {
 		return errors.New("countRows count doesn't match what was set")
 	}

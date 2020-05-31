@@ -29,9 +29,6 @@ func listTables() error {
 	defer resp.Body.Close()
 	var data map[string][]string
 	json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		return err
-	}
 
 	if len(data["tables"]) != 1 || data["tables"][0] != "test1" {
 		return errors.New("listTables tables do not match those set")
