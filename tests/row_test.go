@@ -250,7 +250,7 @@ func readRowsWithColumns() error {
 	if len(data) < 20 {
 		return errors.New("readRowsWithColumns response body doesn't have all rows")
 	}
-	for col, _ := range data["key1"] {
+	for col := range data["key1"] {
 		if col != "col1" && col != "col2" {
 			return errors.New("readRowsWithColumns got columns other than requested")
 		}
@@ -276,7 +276,7 @@ func readRowsWithLimit() error {
 	}
 	// Check keys returned are sorted
 	keys := []string{}
-	for key, _ := range data {
+	for key := range data {
 		keys = append(keys, key)
 	}
 	if !sort.StringsAreSorted(keys) {

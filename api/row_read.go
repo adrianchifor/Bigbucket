@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -97,6 +98,7 @@ func getRows(c *gin.Context) {
 	rowsAdded := 0
 	resultsMutex := &sync.Mutex{}
 
+	sort.Strings(objects)
 	for _, object := range objects {
 		object := object
 		if strings.HasSuffix(object, "/") || strings.Count(object, "/") < 3 {
@@ -202,6 +204,7 @@ func listRows(c *gin.Context) {
 		rowKey := strings.Split(row, "/")[2]
 		rowKeys = append(rowKeys, rowKey)
 	}
+	sort.Strings(rowKeys)
 
 	c.JSON(200, gin.H{"table": table, "rowKeys": rowKeys})
 }
