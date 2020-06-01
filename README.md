@@ -607,16 +607,17 @@ $ ./bin/bigbucket --bucket gs://<your-bucket>
  - using env:   export GIN_MODE=release
  - using code:  gin.SetMode(gin.ReleaseMode)
 
-[GIN-debug] GET    /api/table                --> bigbucket/api.listTables (3 handlers)
-[GIN-debug] DELETE /api/table                --> bigbucket/api.deleteTable (3 handlers)
-[GIN-debug] GET    /api/column               --> bigbucket/api.listColumns (3 handlers)
-[GIN-debug] DELETE /api/column               --> bigbucket/api.deleteColumn (3 handlers)
-[GIN-debug] GET    /api/row                  --> bigbucket/api.getRows (3 handlers)
-[GIN-debug] GET    /api/row/count            --> bigbucket/api.getRowsCount (3 handlers)
-[GIN-debug] POST   /api/row                  --> bigbucket/api.setRow (3 handlers)
-[GIN-debug] DELETE /api/row                  --> bigbucket/api.deleteRows (3 handlers)
-[GIN-debug] GET    /health                   --> bigbucket/api.RunServer.func1 (3 handlers)
-2020/05/03 18:34:49 HTTP server is ready to handle requests at 127.0.0.1:8080
+[GIN-debug] GET    /api/table                --> github.com/adrianchifor/Bigbucket/api.listTables (3 handlers)
+[GIN-debug] DELETE /api/table                --> github.com/adrianchifor/Bigbucket/api.deleteTable (3 handlers)
+[GIN-debug] GET    /api/column               --> github.com/adrianchifor/Bigbucket/api.listColumns (3 handlers)
+[GIN-debug] DELETE /api/column               --> github.com/adrianchifor/Bigbucket/api.deleteColumn (3 handlers)
+[GIN-debug] GET    /api/row                  --> github.com/adrianchifor/Bigbucket/api.getRows (3 handlers)
+[GIN-debug] GET    /api/row/count            --> github.com/adrianchifor/Bigbucket/api.getRowsCount (3 handlers)
+[GIN-debug] GET    /api/row/list             --> github.com/adrianchifor/Bigbucket/api.listRows (3 handlers)
+[GIN-debug] POST   /api/row                  --> github.com/adrianchifor/Bigbucket/api.setRow (3 handlers)
+[GIN-debug] DELETE /api/row                  --> github.com/adrianchifor/Bigbucket/api.deleteRows (3 handlers)
+[GIN-debug] GET    /health                   --> github.com/adrianchifor/Bigbucket/api.RunServer.func1 (3 handlers)
+2020/06/01 22:49:00 HTTP server is ready to handle requests at 127.0.0.1:8080
 ```
 
 ### Tests
