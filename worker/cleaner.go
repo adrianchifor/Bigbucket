@@ -165,28 +165,25 @@ func cleanupColumns(jobPool *parallel.JobPool) {
 		for i, column := range columnsToDelete {
 			column := column
 			noColumnsFound := true
-			noColumnsFoundMutex := &sync.Mutex{}
 
 			for _, object := range objects {
 				object := object
-				jobPool.AddJob(func() {
-					stopCleanerMutex.Lock()
-					if stopCleaner {
-						stopCleanerMutex.Unlock()
-						return
+				if strings.HasSuffix(object, column) {
+					if noColumnsFound {
+						noColumnsFound = false
 					}
-					stopCleanerMutex.Unlock()
 
-					if strings.HasSuffix(object, column) {
-						noColumnsFoundMutex.Lock()
-						if noColumnsFound {
-							noColumnsFound = false
+					jobPool.AddJob(func() {
+						stopCleanerMutex.Lock()
+						if stopCleaner {
+							stopCleanerMutex.Unlock()
+							return
 						}
-						noColumnsFoundMutex.Unlock()
+						stopCleanerMutex.Unlock()
 
 						store.DeleteObject(object)
-					}
-				})
+					})
+				}
 			}
 
 			jobPool.Wait()
