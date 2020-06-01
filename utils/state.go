@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 
-	"bigbucket/store"
+	"github.com/adrianchifor/Bigbucket/store"
 )
 
 func GetState(object string) []string {

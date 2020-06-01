@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	"bigbucket/store"
-	"bigbucket/utils"
+	"github.com/adrianchifor/Bigbucket/store"
+	"github.com/adrianchifor/Bigbucket/utils"
 	"github.com/gin-gonic/gin"
 )
 

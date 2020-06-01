@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"bigbucket/store"
-	"bigbucket/utils"
+	"github.com/adrianchifor/Bigbucket/store"
+	"github.com/adrianchifor/Bigbucket/utils"
 	"github.com/adrianchifor/go-parallel"
 	"github.com/gin-gonic/gin"
 )

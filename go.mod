@@ -1,4 +1,4 @@
-module bigbucket
+module github.com/adrianchifor/Bigbucket
 
 go 1.14
 

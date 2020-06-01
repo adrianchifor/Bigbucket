@@ -1,7 +1,7 @@
 package api
 
 import (
-	"bigbucket/utils"
+	"github.com/adrianchifor/Bigbucket/utils"
 	"github.com/gin-gonic/gin"
 )
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"bigbucket/store"
+	"github.com/adrianchifor/Bigbucket/store"
 	"github.com/adrianchifor/go-parallel"
 	"github.com/gin-gonic/gin"
 )

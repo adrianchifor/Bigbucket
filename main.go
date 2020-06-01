@@ -7,12 +7,12 @@ import (
 	"strconv"
 	"strings"
 
-	"bigbucket/api"
-	"bigbucket/store"
-	"bigbucket/worker"
+	"github.com/adrianchifor/Bigbucket/api"
+	"github.com/adrianchifor/Bigbucket/store"
+	"github.com/adrianchifor/Bigbucket/worker"
 )
 
-const version string = "0.2.1"
+const version string = "0.2.2"
 
 var (
 	port            int
