@@ -1,6 +1,6 @@
 # Bigbucket
 
-![Docker](https://github.com/adrianchifor/Bigbucket/workflows/Publish%20Docker/badge.svg)
+![Docker](https://github.com/adrianchifor/Bigbucket/workflows/Publish%20Docker/badge.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/adrianchifor/Bigbucket)](https://goreportcard.com/report/github.com/adrianchifor/Bigbucket)
 
 Bigbucket is a serverless NoSQL database with a focus on scalability, availability and simplicity. It has a Bigtable-style data model with storage backed by a Cloud Storage Bucket.
 
