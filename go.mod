@@ -3,9 +3,9 @@ module github.com/adrianchifor/Bigbucket
 go 1.14
 
 require (
-	cloud.google.com/go/storage v1.6.0
+	cloud.google.com/go/storage v1.8.0
 	github.com/DataDog/zstd v1.4.5
 	github.com/adrianchifor/go-parallel v0.1.0
-	github.com/gin-gonic/gin v1.6.2
-	google.golang.org/api v0.22.0
+	github.com/gin-gonic/gin v1.6.3
+	google.golang.org/api v0.24.0
 )
