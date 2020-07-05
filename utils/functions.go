@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// Linear search, returns first index where found, otherwise -1
+// Search returns first index where found, otherwise -1
 func Search(list []string, a string) int {
 	for i, elem := range list {
 		if elem == a {
@@ -14,7 +14,7 @@ func Search(list []string, a string) int {
 	return -1
 }
 
-// Remove item from slice at index
+// RemoveIndex removes item from slice at index
 func RemoveIndex(list []string, index int) []string {
 	list[index] = list[len(list)-1]
 	list[len(list)-1] = ""
@@ -23,7 +23,7 @@ func RemoveIndex(list []string, index int) []string {
 	return list
 }
 
-// Merge multiple maps into one; duplicate k-v in subsequent maps will override previous ones
+// MergeMaps merges multiple maps into one; duplicate k-v in subsequent maps will override previous ones
 func MergeMaps(maps ...map[string]string) map[string]string {
 	mergedMap := make(map[string]string)
 	for _, innerMap := range maps {
@@ -35,7 +35,7 @@ func MergeMaps(maps ...map[string]string) map[string]string {
 	return mergedMap
 }
 
-// Filter out 'bigbucket' and '/' from tables []string
+// CleanupTables filters out 'bigbucket' and '/' from tables []string
 func CleanupTables(tables []string) []string {
 	cleanTables := []string{}
 	for _, table := range tables {

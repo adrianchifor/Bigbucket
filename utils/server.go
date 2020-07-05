@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Create and run a new Gin HTTP server with graceful shutdown
+// RunServer creates and runs a new Gin HTTP server with graceful shutdown
 func RunServer(port int, router *gin.Engine) {
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)

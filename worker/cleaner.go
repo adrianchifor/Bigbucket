@@ -22,7 +22,7 @@ var (
 	stopCleanerMutex = &sync.Mutex{}
 )
 
-// Run cleaner once or on an interval
+// RunCleaner runs the cleaner once or on an interval
 func RunCleaner(interval int) {
 	done := make(chan bool, 1)
 	quit := make(chan os.Signal, 1)
@@ -58,7 +58,7 @@ func RunCleaner(interval int) {
 	log.Println("Cleaner process done")
 }
 
-// Run cleaner on HTTP POSTs
+// RunCleanerHttp runs an HTTP server+router for cleaner
 func RunCleanerHttp(port int) {
 	deleteJobPool := parallel.LargeJobPool()
 	defer deleteJobPool.Close()

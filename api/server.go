@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Run HTTP server+router for API
+// RunServer runs the HTTP server+router for API
 func RunServer(port int) {
 	router := gin.Default()
 
