@@ -7,6 +7,7 @@ import (
 	"github.com/adrianchifor/Bigbucket/store"
 )
 
+// Get object content as string[]
 func GetState(object string) []string {
 	state := []string{}
 
@@ -20,6 +21,7 @@ func GetState(object string) []string {
 	return state
 }
 
+// Write string[] to object
 func WriteState(object string, state []string) error {
 	buf := &bytes.Buffer{}
 	gob.NewEncoder(buf).Encode(state)

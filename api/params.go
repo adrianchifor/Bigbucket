@@ -20,7 +20,7 @@ func parseRequiredRequestParams(c *gin.Context, params ...string) (map[string]st
 			c.JSON(400, gin.H{
 				"error": fmt.Sprintf("Please provide '%s' as a querystring parameter", param),
 			})
-			return nil, errors.New(fmt.Sprintf("Failed to parse '%s' querystring parameter", param))
+			return nil, fmt.Errorf("Failed to parse '%s' querystring parameter", param)
 		}
 		if err := validateParam(c, paramValue); err != nil {
 			return nil, err
@@ -54,7 +54,7 @@ func parseExclusiveRequestParams(c *gin.Context, firstParam string, secondParam 
 		c.JSON(400, gin.H{
 			"error": fmt.Sprintf("Please provide only one of '%s' or '%s' as a querystring parameter", firstParam, secondParam),
 		})
-		return "", "", errors.New(fmt.Sprintf("Failed to parse '%s, %s' querystring parameters", firstParam, secondParam))
+		return "", "", fmt.Errorf("Failed to parse '%s, %s' querystring parameters", firstParam, secondParam)
 	}
 	if err := validateParam(c, firstParamVal); err != nil {
 		return "", "", err

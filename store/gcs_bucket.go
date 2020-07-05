@@ -13,10 +13,12 @@ import (
 )
 
 var (
+	// GCS bucket name
 	BucketName string
 	GoogBucket storage.BucketHandle
 )
 
+// Initialize GCS bucket client
 func InitGoog() {
 	gcsClient, err := storage.NewClient(context.Background())
 	if err != nil {
@@ -26,6 +28,7 @@ func InitGoog() {
 	GoogBucket = *gcsClient.Bucket(BucketName)
 }
 
+// List objects in GCS bucket
 func ListObjects(prefix string, delimiter string, limit int) ([]string, error) {
 	ctxTimeout, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
@@ -57,6 +60,7 @@ func ListObjects(prefix string, delimiter string, limit int) ([]string, error) {
 	return objects, nil
 }
 
+// Write data to GCS object, will be compressed with zstd
 func WriteObject(object string, data []byte) error {
 	if len(object) == 0 {
 		return errors.New("store.WriteObject: object cannot be empty string")
@@ -85,6 +89,7 @@ func WriteObject(object string, data []byte) error {
 	return nil
 }
 
+// Read data from GCS object, will be automatically decompressed
 func ReadObject(object string) ([]byte, error) {
 	if len(object) == 0 {
 		return nil, errors.New("store.ReadObject: object cannot be empty string")
@@ -112,6 +117,7 @@ func ReadObject(object string) ([]byte, error) {
 	return data, nil
 }
 
+// Delete GCS object
 func DeleteObject(object string) error {
 	if len(object) == 0 {
 		return errors.New("store.DeleteObject: object cannot be empty string")
