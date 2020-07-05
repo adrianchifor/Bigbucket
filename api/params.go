@@ -89,3 +89,7 @@ func isObjectNameValid(object string) bool {
 
 	return true
 }
+
+func allowCORS(c *gin.Context) {
+	c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+}

@@ -15,6 +15,7 @@ import (
 )
 
 func getRows(c *gin.Context) {
+	allowCORS(c)
 	tableMap, err := parseRequiredRequestParams(c, "table")
 	if err != nil {
 		return
