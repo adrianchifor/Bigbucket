@@ -90,6 +90,8 @@ func isObjectNameValid(object string) bool {
 	return true
 }
 
-func allowCORS(c *gin.Context) {
-	c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+func allowCORSForBrowsers(c *gin.Context) {
+	if value := c.Request.Header.Get("User-Agent"); strings.HasPrefix(value, "Mozilla") {
+		c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+	}
 }
