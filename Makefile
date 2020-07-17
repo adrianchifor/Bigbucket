@@ -1,4 +1,4 @@
-.PHONY: fmt download build test docker docker_push clean
+.PHONY: fmt download build test docker clean
 
 all: fmt download build
 
