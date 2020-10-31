@@ -7,11 +7,13 @@ COPY . /go/src/bigbucket
 
 RUN go mod download
 
-RUN GOOS=linux GOARCH=amd64 go build -o /go/bin/bigbucket
+RUN go build -o /go/bin/bigbucket
 
 
 # Runner
 FROM alpine
+
+LABEL org.opencontainers.image.source https://github.com/adrianchifor/bigbucket
 
 RUN apk add --no-cache ca-certificates && update-ca-certificates
 
