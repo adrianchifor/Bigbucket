@@ -387,7 +387,7 @@ docker run -d --name "bigbucket-api" \
   -e BUCKET=gs://<bucket-name> \
   -v ${HOME}/.config/gcloud:/root/.config/gcloud \
   -p 8080:8080 \
-  adrianchifor/bigbucket:latest
+  ghcr.io/adrianchifor/bigbucket:latest
 ```
 
 Cleaner
@@ -398,7 +398,7 @@ docker run -d --name "bigbucket-cleaner" \
   -e CLEANER=true \
   -e CLEANER_INTERVAL=30 \
   -v ${HOME}/.config/gcloud:/root/.config/gcloud \
-  adrianchifor/bigbucket:latest
+  ghcr.io/adrianchifor/bigbucket:latest
 ```
 
 We mount `${HOME}/.config/gcloud:/root/.config/gcloud` in both cases so the containers can use our local gcloud credentials to talk to the bucket.
