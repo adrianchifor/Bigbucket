@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: bigbucket
-          image: adrianchifor/bigbucket:latest
+          image: ghcr.io/adrianchifor/bigbucket:latest
           imagePullPolicy: Always
           env:
             - name: BUCKET
@@ -73,7 +73,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: bigbucket-cleaner
-              image: adrianchifor/bigbucket:latest
+              image: ghcr.io/adrianchifor/bigbucket:latest
               imagePullPolicy: Always
               env:
                 - name: BUCKET
