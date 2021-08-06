@@ -558,7 +558,7 @@ If the flags are not set, Bigbucket will look for the equivalent env vars:
 
 ## Contributing
 
-Requirements: Go 1.14, gcloud/gsutil setup (for GCS usage)
+Requirements: Go 1.16, gcloud/gsutil setup (for GCS usage)
 
 ### Project structure
 
@@ -623,6 +623,10 @@ $ ./bin/bigbucket --bucket gs://<your-bucket>
 ### Tests
 
 Setup an empty bucket in GCS for testing. Make sure gcloud/gsutil is setup/authenticated locally.
+
+```
+gcloud auth application-default login
+```
 
 Running the tests suite:
 

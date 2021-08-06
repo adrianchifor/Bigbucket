@@ -1,4 +1,4 @@
-FROM golang:1.14-alpine as builder
+FROM golang:1.16-alpine as builder
 
 RUN apk add --no-cache git gcc musl-dev
 
@@ -8,7 +8,6 @@ COPY . /go/src/bigbucket
 RUN go mod download
 
 RUN go build -o /go/bin/bigbucket
-
 
 # Runner
 FROM alpine

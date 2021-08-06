@@ -9,7 +9,7 @@ BUCKET="$1"
 
 function cleanup() {
   echo -e "\nCleaning up test bucket"
-  gsutil rm -r "$BUCKET/bigbucket" > /dev/null 2>&1
+  gsutil rm -r "$BUCKET/bigbucket" > /dev/null 2>&1 || true
 
   echo "Cleaning up bigbucket processes"
   for process in $(pgrep bigbucket); do

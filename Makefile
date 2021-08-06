@@ -23,4 +23,5 @@ docker:
 
 clean:
 	rm -rf bin/
+	go mod tidy
 	go clean -modcache
