@@ -12,7 +12,7 @@ import (
 	"github.com/adrianchifor/Bigbucket/worker"
 )
 
-const version string = "0.2.9"
+const version string = "0.2.10"
 
 var (
 	port            int
